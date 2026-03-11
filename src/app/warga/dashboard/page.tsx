@@ -28,6 +28,7 @@ import { smartFarmService } from "@/services/smartfarm.service";
 import { useAuth } from "@/hooks/useAuth";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import type { Donation, SmartFarm } from "@/types";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function WargaDashboardPage() {
   const { user, logout } = useAuth();
@@ -64,20 +65,20 @@ export default function WargaDashboardPage() {
   const getStatusBadge = (status: string) => {
     const config: Record<string, { className: string; label: string }> = {
       PENDING: {
-        className: "bg-amber-100 text-amber-800 border-amber-200",
+        className: "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-800",
         label: "Menunggu",
       },
       APPROVED: {
-        className: "bg-emerald-100 text-emerald-800 border-emerald-200",
+        className: "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800",
         label: "Disetujui",
       },
       REJECTED: {
-        className: "bg-red-100 text-red-800 border-red-200",
+        className: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800",
         label: "Ditolak",
       },
     };
     const style = config[status] ?? {
-      className: "bg-gray-100 text-gray-800 border-gray-200",
+      className: "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700",
       label: status,
     };
     return (
@@ -100,15 +101,15 @@ export default function WargaDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-emerald-50/30 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-emerald-50/30 dark:from-gray-950 dark:to-emerald-950/20 relative overflow-hidden">
       {/* Decorative Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-200/20 rounded-full blur-3xl animate-pulse-slow animation-delay-1000"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-200/20 dark:bg-emerald-900/10 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-200/20 dark:bg-teal-900/10 rounded-full blur-3xl animate-pulse-slow animation-delay-1000"></div>
       </div>
 
       {/* Navbar */}
-      <nav className="relative z-10 bg-white/80 backdrop-blur-md shadow-lg border-b-2 border-emerald-100 animate-fade-in-down">
+      <nav className="relative z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-lg border-b-2 border-emerald-100 dark:border-gray-800 animate-fade-in-down">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-3 animate-slide-in-left">
@@ -116,47 +117,50 @@ export default function WargaDashboardPage() {
                 <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
                   <Home className="w-6 h-6 text-white" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-amber-400 rounded-full border-2 border-white"></div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-amber-400 rounded-full border-2 border-white dark:border-gray-900"></div>
               </div>
               <div>
-                <span className="text-xl font-black bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
+                <span className="text-xl font-black bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
                   Dashboard Warga
                 </span>
-                <p className="text-xs text-gray-500 font-medium">Desa Cerdas</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Desa Cerdas</p>
               </div>
             </div>
             <div className="flex items-center gap-4 animate-slide-in-right">
-              <Link href="/kegiatan">
+              <Link href="/kegiatan" className="hidden sm:block">
                 <Button
                   variant="ghost"
-                  className="font-semibold text-gray-700 hover:text-emerald-700 hover:bg-emerald-50"
+                  className="font-semibold text-gray-700 dark:text-gray-300 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-gray-800"
                 >
                   <Eye className="w-4 h-4 mr-2" />
                   Lihat Kegiatan
                 </Button>
               </Link>
-              <Link href="/smartfarm">
+              <Link href="/smartfarm" className="hidden sm:block">
                 <Button
                   variant="ghost"
-                  className="font-semibold text-gray-700 hover:text-emerald-700 hover:bg-emerald-50"
+                  className="font-semibold text-gray-700 dark:text-gray-300 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-gray-800"
                 >
                   <Sprout className="w-4 h-4 mr-2" />
                   Smart Farm
                 </Button>
               </Link>
-              <div className="flex items-center gap-3 pl-4 border-l border-gray-300">
-                <div className="text-right">
-                  <p className="text-sm font-bold text-gray-900">{user.nama}</p>
+              <div className="hidden sm:block">
+                <ThemeToggle />
+              </div>
+              <div className="flex items-center gap-3 pl-4 border-l border-gray-300 dark:border-gray-700">
+                <div className="text-right hidden sm:block">
+                  <p className="text-sm font-bold text-gray-900 dark:text-gray-100">{user.nama}</p>
                   <Badge className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs">
                     WARGA
                   </Badge>
                 </div>
                 <Button
                   onClick={handleLogout}
-                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
+                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all text-sm px-3 sm:px-4"
                 >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Keluar
+                  <LogOut className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Keluar</span>
                 </Button>
               </div>
             </div>
@@ -166,14 +170,14 @@ export default function WargaDashboardPage() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Welcome Card */}
-        <Card className="border-2 shadow-2xl mb-10 overflow-hidden animate-fade-in-up animation-delay-200">
-          <CardHeader className="bg-gradient-to-br from-emerald-600 via-green-600 to-teal-600 text-white p-10 relative">
+        <Card className="dark:bg-gray-900/40 dark:border-gray-800 border-2 shadow-2xl mb-10 overflow-hidden animate-fade-in-up animation-delay-200">
+          <CardHeader className="bg-gradient-to-br from-emerald-600 via-green-600 to-teal-600 dark:from-emerald-900 dark:via-green-900 dark:to-teal-900 text-white p-10 relative">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNiIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utb3BhY2l0eT0iLjA1IiBzdHJva2Utd2lkdGg9IjIiLz48L2c+PC9zdmc+')] opacity-20"></div>
             <div className="relative z-10">
               <CardTitle className="text-4xl font-black mb-3 text-white">
                 Selamat Datang, {user.nama}! 👋
               </CardTitle>
-              <CardDescription className="text-emerald-100 text-lg font-medium">
+              <CardDescription className="text-emerald-100 dark:text-emerald-200 text-lg font-medium">
                 Kelola donasi dan tanaman Anda dengan mudah
               </CardDescription>
             </div>
@@ -182,14 +186,14 @@ export default function WargaDashboardPage() {
 
         {/* Stats Cards */}
         <div className="grid sm:grid-cols-2 gap-6 mb-10">
-          <Card className="border-2 shadow-2xl hover:shadow-emerald-200 transition-all animate-fade-in-up animation-delay-300">
+          <Card className="dark:bg-gray-900/60 dark:border-gray-800 border-2 shadow-2xl hover:shadow-emerald-200 dark:hover:shadow-emerald-900/50 transition-all animate-fade-in-up animation-delay-300">
             <CardContent className="p-8">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-sm font-black text-gray-500 uppercase tracking-wider mb-2">
+                  <p className="text-sm font-black text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                     Total Donasi Saya
                   </p>
-                  <p className="text-4xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                  <p className="text-4xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
                     {donations.length}
                   </p>
                 </div>
@@ -198,11 +202,11 @@ export default function WargaDashboardPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Badge className="bg-emerald-100 text-emerald-800 border-2 border-emerald-200 font-bold">
+                <Badge className="bg-emerald-100 text-emerald-800 border-2 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800 font-bold">
                   {donations.filter((d) => d.status === "APPROVED").length}{" "}
                   disetujui
                 </Badge>
-                <Badge className="bg-amber-100 text-amber-800 border-2 border-amber-200 font-bold">
+                <Badge className="bg-amber-100 text-amber-800 border-2 border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-800 font-bold">
                   {donations.filter((d) => d.status === "PENDING").length}{" "}
                   pending
                 </Badge>
@@ -210,14 +214,14 @@ export default function WargaDashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-2 shadow-2xl hover:shadow-emerald-200 transition-all animate-fade-in-up animation-delay-400">
+          <Card className="dark:bg-gray-900/60 dark:border-gray-800 border-2 shadow-2xl hover:shadow-emerald-200 dark:hover:shadow-emerald-900/50 transition-all animate-fade-in-up animation-delay-400">
             <CardContent className="p-8">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-sm font-black text-gray-500 uppercase tracking-wider mb-2">
+                  <p className="text-sm font-black text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                     Data Tanaman
                   </p>
-                  <p className="text-4xl font-black bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                  <p className="text-4xl font-black bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">
                     {farms.length}
                   </p>
                 </div>
@@ -236,32 +240,32 @@ export default function WargaDashboardPage() {
         </div>
 
         {/* My Donations Section */}
-        <Card className="border-2 shadow-2xl mb-10 animate-fade-in-up animation-delay-500">
-          <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-100">
+        <Card className="dark:bg-gray-900/60 dark:border-gray-800 border-2 shadow-2xl mb-10 animate-fade-in-up animation-delay-500">
+          <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-800/80 border-b-2 border-emerald-100 dark:border-gray-800">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center">
                 <Heart className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-2xl font-black text-gray-900">
+                <CardTitle className="text-2xl font-black text-gray-900 dark:text-gray-100">
                   Riwayat Donasi Saya
                 </CardTitle>
-                <CardDescription className="text-base">
+                <CardDescription className="text-base dark:text-gray-400">
                   Donasi yang telah Anda berikan
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-8">
+          <CardContent className="p-0 sm:p-8">
             {donations.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="inline-block p-5 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-3xl mb-6 animate-bounce-in">
-                  <Heart className="w-16 h-16 text-emerald-600" />
+              <div className="text-center py-16 p-4">
+                <div className="inline-block p-5 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-3xl mb-6 animate-bounce-in">
+                  <Heart className="w-16 h-16 text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <h3 className="text-2xl font-black text-gray-900 mb-3">
+                <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100 mb-3">
                   Belum Ada Donasi
                 </h3>
-                <p className="text-gray-600 font-medium max-w-md mx-auto mb-6">
+                <p className="text-gray-600 dark:text-gray-400 font-medium max-w-md mx-auto mb-6">
                   Mulai berbagi kebaikan dengan memberikan donasi untuk kegiatan
                   desa
                 </p>
@@ -276,17 +280,17 @@ export default function WargaDashboardPage() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b-2 border-emerald-100">
-                      <th className="text-left p-4 font-black text-gray-700 uppercase tracking-wider text-sm">
+                    <tr className="border-b-2 border-emerald-100 dark:border-gray-800">
+                      <th className="text-left p-4 font-black text-gray-700 dark:text-gray-300 uppercase tracking-wider text-sm">
                         Kegiatan
                       </th>
-                      <th className="text-left p-4 font-black text-gray-700 uppercase tracking-wider text-sm">
+                      <th className="text-left p-4 font-black text-gray-700 dark:text-gray-300 uppercase tracking-wider text-sm">
                         Jumlah
                       </th>
-                      <th className="text-left p-4 font-black text-gray-700 uppercase tracking-wider text-sm">
+                      <th className="text-left p-4 font-black text-gray-700 dark:text-gray-300 uppercase tracking-wider text-sm">
                         Tanggal
                       </th>
-                      <th className="text-left p-4 font-black text-gray-700 uppercase tracking-wider text-sm">
+                      <th className="text-left p-4 font-black text-gray-700 dark:text-gray-300 uppercase tracking-wider text-sm">
                         Status
                       </th>
                     </tr>
@@ -295,23 +299,23 @@ export default function WargaDashboardPage() {
                     {donations.map((donation) => (
                       <tr
                         key={donation.id}
-                        className="border-b border-gray-100 hover:bg-emerald-50/50 transition-colors"
+                        className="border-b border-gray-100 dark:border-gray-800 hover:bg-emerald-50/50 dark:hover:bg-gray-800/50 transition-colors"
                       >
                         <td className="p-4">
-                          <p className="font-bold text-gray-900">
+                          <p className="font-bold text-gray-900 dark:text-gray-100">
                             {donation.kegiatan?.title || "N/A"}
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             {donation.donor_name || "Anonim"}
                           </p>
                         </td>
                         <td className="p-4">
-                          <p className="font-black text-emerald-600 text-lg">
+                          <p className="font-black text-emerald-600 dark:text-emerald-400 text-lg">
                             {formatCurrency(donation.amount)}
                           </p>
                         </td>
                         <td className="p-4">
-                          <div className="flex items-center gap-2 text-gray-600">
+                          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                             <Calendar className="w-4 h-4" />
                             <span className="font-medium">
                               {new Date(donation.created_at).toLocaleDateString(
@@ -338,18 +342,18 @@ export default function WargaDashboardPage() {
         </Card>
 
         {/* My Farms Section */}
-        <Card className="border-2 shadow-2xl animate-fade-in-up animation-delay-600">
-          <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-100">
+        <Card className="dark:bg-gray-900/60 dark:border-gray-800 border-2 shadow-2xl animate-fade-in-up animation-delay-600">
+          <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-800/80 border-b-2 border-emerald-100 dark:border-gray-800">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center">
                   <Sprout className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <CardTitle className="text-2xl font-black text-gray-900">
+                  <CardTitle className="text-2xl font-black text-gray-900 dark:text-gray-100">
                     Tanaman Saya
                   </CardTitle>
-                  <CardDescription className="text-base">
+                  <CardDescription className="text-base dark:text-gray-400">
                     Data tanaman yang dikelola dengan Smart Farm AI
                   </CardDescription>
                 </div>
@@ -357,21 +361,21 @@ export default function WargaDashboardPage() {
               <Link href="/smartfarm">
                 <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold shadow-lg">
                   <PlusCircle className="w-4 h-4 mr-2" />
-                  Tambah
+                  <span className="hidden sm:inline">Tambah</span>
                 </Button>
               </Link>
             </div>
           </CardHeader>
-          <CardContent className="p-8">
+          <CardContent className="p-4 sm:p-8">
             {farms.length === 0 ? (
               <div className="text-center py-16">
-                <div className="inline-block p-5 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-3xl mb-6 animate-bounce-in">
-                  <Sprout className="w-16 h-16 text-emerald-600" />
+                <div className="inline-block p-5 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-3xl mb-6 animate-bounce-in">
+                  <Sprout className="w-16 h-16 text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <h3 className="text-2xl font-black text-gray-900 mb-3">
+                <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100 mb-3">
                   Belum Ada Data Tanaman
                 </h3>
-                <p className="text-gray-600 font-medium max-w-md mx-auto mb-6">
+                <p className="text-gray-600 dark:text-gray-400 font-medium max-w-md mx-auto mb-6">
                   Mulai kelola tanaman dengan bantuan AI untuk hasil yang lebih
                   baik
                 </p>
@@ -387,13 +391,13 @@ export default function WargaDashboardPage() {
                 {farms.slice(0, 3).map((farm, index) => (
                   <Card
                     key={farm.id}
-                    className={`border-2 hover:shadow-lg transition-all animate-scale-in animation-delay-${(index + 7) * 100}`}
+                    className={`border-2 dark:border-gray-800 dark:bg-gray-800 hover:shadow-lg transition-all animate-scale-in animation-delay-${(index + 7) * 100}`}
                   >
-                    <CardHeader className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-5">
+                    <CardHeader className="bg-gradient-to-r from-green-500 to-emerald-600 dark:from-green-700 dark:to-emerald-800 text-white p-5">
                       <CardTitle className="text-xl font-black">
                         {farm.crop_type}
                       </CardTitle>
-                      <CardDescription className="text-emerald-100 font-medium flex items-center gap-1">
+                      <CardDescription className="text-emerald-100 dark:text-emerald-200 font-medium flex items-center gap-1">
                         <User className="w-3 h-3" />
                         {farm.location}
                       </CardDescription>
@@ -401,31 +405,31 @@ export default function WargaDashboardPage() {
                     <CardContent className="p-5">
                       <div className="space-y-3 mb-4">
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600 font-semibold">
+                          <span className="text-sm text-gray-600 dark:text-gray-400 font-semibold">
                             Luas Area
                           </span>
-                          <span className="font-black text-gray-900">
+                          <span className="font-black text-gray-900 dark:text-gray-100">
                             {farm.area_size} m²
                           </span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600 font-semibold">
+                          <span className="text-sm text-gray-600 dark:text-gray-400 font-semibold">
                             Jenis Tanah
                           </span>
-                          <span className="font-black text-gray-900 capitalize">
+                          <span className="font-black text-gray-900 dark:text-gray-100 capitalize">
                             {farm.soil_type}
                           </span>
                         </div>
                       </div>
                       {farm.ai_recommendation && (
-                        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-xl p-3">
+                        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-900 dark:to-gray-900 border-2 border-emerald-200 dark:border-emerald-900/50 rounded-xl p-3">
                           <div className="flex items-center gap-2 mb-2">
-                            <Sparkles className="w-4 h-4 text-emerald-600" />
-                            <p className="text-xs font-black text-emerald-800 uppercase">
+                            <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <p className="text-xs font-black text-emerald-800 dark:text-emerald-300 uppercase">
                               Rekomendasi AI
                             </p>
                           </div>
-                          <p className="text-sm text-emerald-900 line-clamp-2 font-medium">
+                          <p className="text-sm text-emerald-900 dark:text-emerald-400 line-clamp-2 font-medium">
                             {farm.ai_recommendation}
                           </p>
                         </div>
@@ -440,7 +444,7 @@ export default function WargaDashboardPage() {
                 <Link href="/smartfarm">
                   <Button
                     variant="outline"
-                    className="border-2 border-emerald-300 hover:bg-emerald-50 font-bold"
+                    className="border-2 border-emerald-300 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 font-bold"
                   >
                     Lihat Semua Tanaman ({farms.length})
                   </Button>

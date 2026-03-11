@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Eye, EyeOff, Home, AlertCircle, Sparkles, Heart, Scale, Sprout } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -60,7 +61,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
-      <div className="hidden lg:flex relative bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 p-12 flex-col justify-between overflow-hidden">
+      <div className="hidden lg:flex relative bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 dark:from-emerald-900 dark:via-gray-900 dark:to-teal-950 p-12 flex-col justify-between overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-400/20 rounded-full blur-3xl animate-pulse-slow"></div>
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-teal-400/20 rounded-full blur-3xl animate-pulse-slow animation-delay-1000"></div>
@@ -114,13 +115,17 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/20 dark:from-black/40 to-transparent pointer-events-none"></div>
       </div>
 
-      <div className="flex items-center justify-center p-6 lg:p-12 bg-gradient-to-br from-gray-50 to-emerald-50/30 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl animate-pulse-slow"></div>
+      <div className="flex items-center justify-center p-6 lg:p-12 bg-gradient-to-br from-gray-50 to-emerald-50/30 dark:from-gray-950 dark:to-emerald-950/20 relative overflow-hidden">
+        <div className="absolute top-4 right-4 z-20">
+          <ThemeToggle />
+        </div>
+        
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-200/20 dark:bg-emerald-900/10 rounded-full blur-3xl animate-pulse-slow"></div>
 
-        <Card className="w-full max-w-md relative z-10 border-2 shadow-2xl animate-scale-in">
+        <Card className="w-full max-w-md relative z-10 border-2 dark:border-gray-800 shadow-2xl animate-scale-in dark:bg-gray-900/90 backdrop-blur-sm">
           <CardHeader className="space-y-3">
             <div className="lg:hidden flex justify-center mb-4">
               <Link href="/" className="flex items-center gap-3">
@@ -138,7 +143,7 @@ export default function LoginPage() {
 
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800 transition-colors group w-fit"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition-colors group w-fit"
             >
               <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -147,10 +152,10 @@ export default function LoginPage() {
             </Link>
 
             <div>
-              <CardTitle className="text-3xl font-black bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
+              <CardTitle className="text-3xl font-black bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
                 Selamat Datang
               </CardTitle>
-              <CardDescription className="text-base mt-2">
+              <CardDescription className="text-base mt-2 dark:text-gray-400">
                 Masuk ke akun Anda untuk melanjutkan
               </CardDescription>
             </div>
@@ -158,7 +163,7 @@ export default function LoginPage() {
 
           <CardContent className="space-y-6">
             {error && (
-              <Alert variant="destructive" className="animate-bounce-in">
+              <Alert variant="destructive" className="animate-bounce-in dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
@@ -166,7 +171,7 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-semibold text-gray-700">
+                <Label htmlFor="email" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                   Alamat Email
                 </Label>
                 <Input
@@ -176,13 +181,13 @@ export default function LoginPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="nama@email.com"
-                  className="h-12 border-2 focus:border-emerald-500 focus:ring-emerald-500"
+                  className="h-12 border-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 focus:border-emerald-500 dark:focus:border-emerald-500 focus:ring-emerald-500/20"
                   disabled={loading}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-semibold text-gray-700">
+                <Label htmlFor="password" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                   Kata Sandi
                 </Label>
                 <div className="relative">
@@ -193,21 +198,21 @@ export default function LoginPage() {
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     placeholder="Masukkan kata sandi"
-                    className="h-12 border-2 focus:border-emerald-500 focus:ring-emerald-500 pr-12"
+                    className="h-12 border-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 focus:border-emerald-500 dark:focus:border-emerald-500 focus:ring-emerald-500/20 pr-12"
                     disabled={loading}
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="absolute right-1 top-1 h-10 w-10 hover:bg-emerald-50 cursor-pointer"
+                    className="absolute right-1 top-1 h-10 w-10 hover:bg-emerald-50 dark:hover:bg-gray-700 cursor-pointer"
                     onClick={() => setShowPassword(!showPassword)}
                     disabled={loading}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-500" />
+                      <EyeOff className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                     ) : (
-                      <Eye className="h-5 w-5 text-gray-500" />
+                      <Eye className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                     )}
                   </Button>
                 </div>
@@ -231,16 +236,16 @@ export default function LoginPage() {
           </CardContent>
 
           <CardFooter className="flex-col space-y-4">
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-gray-600 dark:text-gray-400">
               Belum punya akun?{" "}
-              <Link href="/register" className="font-bold text-emerald-700 hover:text-emerald-800 hover:underline transition-colors">
+              <Link href="/register" className="font-bold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 hover:underline transition-colors">
                 Daftar Sekarang
               </Link>
             </p>
 
-            <Alert className="border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50">
-              <Sparkles className="h-4 w-4 text-amber-600" />
-              <AlertDescription className="text-sm text-amber-900">
+            <Alert className="border-2 border-amber-200 dark:border-amber-900/50 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30">
+              <Sparkles className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+              <AlertDescription className="text-sm text-amber-900 dark:text-amber-400">
                 <strong>Demo Mode:</strong> Backend berjalan dalam demo mode.
                 API eksternal menggunakan data mock jika tidak dikonfigurasi.
               </AlertDescription>

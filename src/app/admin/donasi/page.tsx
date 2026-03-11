@@ -32,6 +32,8 @@ import {
   RefreshCw,
   DollarSign,
   X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { authService } from "@/services/auth.service";
 import { donasiService } from "@/services/donasi.service";
@@ -56,6 +58,10 @@ export default function AdminDonasiPage() {
   const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<string | null>(null);
+
+  // Pagination
+  const [dPage, setDPage] = useState(1);
+  const D_PER_PAGE = 10;
 
   // ── Modal state ──────────────────────────────────────────────────────────────
   const [modal, setModal] = useState<{
@@ -169,23 +175,23 @@ export default function AdminDonasiPage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-emerald-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-emerald-50/30 dark:from-gray-900 dark:to-emerald-950/20 flex items-center justify-center">
         <div className="text-center animate-fade-in">
           <div className="w-16 h-16 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse-slow">
             <Loader2 className="w-8 h-8 text-white animate-spin" />
           </div>
-          <p className="text-lg font-semibold text-gray-700">Memuat data...</p>
+          <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">Memuat data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-emerald-50/30 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-emerald-50/30 dark:from-gray-900 dark:to-emerald-950/20 relative overflow-hidden transition-colors duration-300">
       {/* Background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl animate-pulse-slow" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-200/20 rounded-full blur-3xl animate-pulse-slow animation-delay-1000" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-200/20 dark:bg-emerald-900/10 rounded-full blur-3xl animate-pulse-slow" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-200/20 dark:bg-teal-900/10 rounded-full blur-3xl animate-pulse-slow animation-delay-1000" />
       </div>
 
       {/* Toast */}
@@ -213,15 +219,15 @@ export default function AdminDonasiPage() {
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={closeModal}
           />
-          <div className="relative bg-white rounded-2xl shadow-2xl border-2 border-emerald-100 w-full max-w-md animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-emerald-100 dark:border-emerald-900/50 w-full max-w-md animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/40 rounded-xl flex items-center justify-center">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="font-black text-gray-900">Setujui Donasi</h3>
-                  <p className="text-xs text-gray-500">
+                  <h3 className="font-black text-gray-900 dark:text-gray-100">Setujui Donasi</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     Konfirmasi persetujuan
                   </p>
                 </div>
@@ -230,26 +236,26 @@ export default function AdminDonasiPage() {
                 variant="ghost"
                 size="icon"
                 onClick={closeModal}
-                className="hover:bg-red-50 hover:text-red-600"
+                className="hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:text-gray-400"
               >
                 <X className="w-4 h-4" />
               </Button>
             </div>
             <div className="p-6 space-y-4">
-              <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-100 space-y-2">
-                <p className="text-sm text-gray-600">
-                  <span className="font-semibold text-gray-800">Donatur:</span>{" "}
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-100 dark:border-emerald-800/50 space-y-2">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">Donatur:</span>{" "}
                   {modal.donation.donor_name || "Anonim"}
                 </p>
-                <p className="text-sm text-gray-600">
-                  <span className="font-semibold text-gray-800">Kegiatan:</span>{" "}
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">Kegiatan:</span>{" "}
                   {modal.donation.kegiatan?.title || "—"}
                 </p>
-                <p className="text-sm font-black text-emerald-700 text-lg">
+                <p className="text-sm font-black text-emerald-700 dark:text-emerald-400 text-lg">
                   {formatCurrency(modal.donation.amount)}
                 </p>
               </div>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Donasi ini akan disetujui dan nominal akan ditambahkan ke total
                 donasi kegiatan.
               </p>
@@ -258,7 +264,7 @@ export default function AdminDonasiPage() {
               <Button
                 variant="outline"
                 onClick={closeModal}
-                className="flex-1 border-2 font-semibold"
+                className="flex-1 border-2 font-semibold dark:border-gray-700 dark:hover:bg-gray-700"
               >
                 Batal
               </Button>
@@ -291,38 +297,38 @@ export default function AdminDonasiPage() {
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={closeModal}
           />
-          <div className="relative bg-white rounded-2xl shadow-2xl border-2 border-red-100 w-full max-w-md animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-red-100 dark:border-red-900/50 w-full max-w-md animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-                  <XCircle className="w-5 h-5 text-red-600" />
+                <div className="w-10 h-10 bg-red-100 dark:bg-red-900/40 rounded-xl flex items-center justify-center">
+                  <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
                 </div>
                 <div>
-                  <h3 className="font-black text-gray-900">Tolak Donasi</h3>
-                  <p className="text-xs text-gray-500">Isi alasan penolakan</p>
+                  <h3 className="font-black text-gray-900 dark:text-gray-100">Tolak Donasi</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Isi alasan penolakan</p>
                 </div>
               </div>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={closeModal}
-                className="hover:bg-red-50 hover:text-red-600"
+                className="hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:text-gray-400"
               >
                 <X className="w-4 h-4" />
               </Button>
             </div>
             <div className="p-6 space-y-4">
-              <div className="bg-red-50 rounded-xl p-4 border border-red-100 space-y-2">
-                <p className="text-sm text-gray-600">
-                  <span className="font-semibold text-gray-800">Donatur:</span>{" "}
+              <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-4 border border-red-100 dark:border-red-800/50 space-y-2">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">Donatur:</span>{" "}
                   {modal.donation.donor_name || "Anonim"}
                 </p>
-                <p className="text-sm font-black text-red-700 text-lg">
+                <p className="text-sm font-black text-red-700 dark:text-red-400 text-lg">
                   {formatCurrency(modal.donation.amount)}
                 </p>
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-black text-gray-700 uppercase tracking-wider">
+                <Label className="text-sm font-black text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                   Alasan Penolakan *
                 </Label>
                 <Textarea
@@ -333,7 +339,7 @@ export default function AdminDonasiPage() {
                     if (rejectError) setRejectError("");
                   }}
                   placeholder="Contoh: Bukti transfer tidak jelas, nominal tidak sesuai, dll."
-                  className={`border-2 focus:border-red-400 resize-none ${rejectError ? "border-red-400 bg-red-50" : ""}`}
+                  className={`border-2 focus:border-red-400 dark:border-gray-700 dark:bg-gray-900 resize-none ${rejectError ? "border-red-400 bg-red-50 dark:bg-red-900/20" : ""}`}
                 />
                 {rejectError && (
                   <p className="text-xs text-red-600 font-semibold flex items-center gap-1">
@@ -380,17 +386,17 @@ export default function AdminDonasiPage() {
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={closeModal}
           />
-          <div className="relative bg-white rounded-2xl shadow-2xl border-2 border-gray-200 w-full max-w-lg animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between p-4 border-b border-gray-100">
-              <h3 className="font-black text-gray-900 flex items-center gap-2">
-                <ImageIcon className="w-4 h-4 text-emerald-600" />
+          <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-gray-200 dark:border-gray-700 w-full max-w-lg animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
+              <h3 className="font-black text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <ImageIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 Bukti Transfer — {modal.donation.donor_name || "Anonim"}
               </h3>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={closeModal}
-                className="hover:bg-red-50 hover:text-red-600"
+                className="hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:text-gray-400"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -415,13 +421,13 @@ export default function AdminDonasiPage() {
                   </a>
                 </>
               ) : (
-                <div className="h-48 flex items-center justify-center text-gray-400">
+                <div className="h-48 flex items-center justify-center text-gray-400 dark:text-gray-500">
                   <AlertCircle className="w-8 h-8 mr-2" /> Tidak ada bukti
                   transfer
                 </div>
               )}
             </div>
-            <div className="flex gap-3 p-4 pt-0 border-t border-gray-100">
+            <div className="flex gap-3 p-4 pt-0 border-t border-gray-100 dark:border-gray-700">
               <Button
                 onClick={() => {
                   closeModal();
@@ -456,10 +462,10 @@ export default function AdminDonasiPage() {
               <Heart className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl font-black bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-black bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
                 Donasi Pending
               </h1>
-              <p className="text-gray-600 font-medium">
+              <p className="text-gray-600 dark:text-gray-400 font-medium">
                 Verifikasi dan setujui donasi yang masuk
               </p>
             </div>
@@ -467,7 +473,7 @@ export default function AdminDonasiPage() {
           <div className="flex items-center gap-3">
             <Badge
               variant="outline"
-              className="border-2 border-amber-300 bg-amber-50 text-amber-800 font-semibold px-4 py-2"
+              className="border-2 border-amber-300 dark:border-amber-700/50 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-400 font-semibold px-4 py-2"
             >
               {donations.length} menunggu
             </Badge>
@@ -475,7 +481,7 @@ export default function AdminDonasiPage() {
               variant="outline"
               onClick={loadDonations}
               disabled={loading}
-              className="border-2 border-emerald-200 hover:bg-emerald-50 font-semibold"
+              className="border-2 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 font-semibold dark:bg-gray-800"
             >
               <RefreshCw
                 className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`}
@@ -487,29 +493,29 @@ export default function AdminDonasiPage() {
 
         {/* Table */}
         {donations.length === 0 ? (
-          <Card className="border-2 shadow-2xl">
+          <Card className="border-2 dark:border-gray-800 shadow-2xl dark:bg-gray-800/50">
             <CardContent className="text-center py-16">
-              <div className="inline-block p-5 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-3xl mb-6">
-                <CheckCircle2 className="w-16 h-16 text-emerald-600" />
+              <div className="inline-block p-5 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/50 dark:to-teal-900/50 rounded-3xl mb-6">
+                <CheckCircle2 className="w-16 h-16 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <h3 className="text-2xl font-black text-gray-900 mb-3">
+              <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100 mb-3">
                 Semua Donasi Sudah Diproses
               </h3>
-              <p className="text-gray-600 font-medium max-w-md mx-auto">
+              <p className="text-gray-600 dark:text-gray-400 font-medium max-w-md mx-auto">
                 Tidak ada donasi pending saat ini. Donasi baru akan muncul di
                 sini untuk diverifikasi.
               </p>
             </CardContent>
           </Card>
         ) : (
-          <Card className="border-2 shadow-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-100 pb-4">
-              <CardTitle className="text-lg font-black text-gray-900 flex items-center gap-2">
-                <DollarSign className="w-5 h-5 text-emerald-600" />
+          <Card className="border-2 dark:border-gray-800 shadow-2xl overflow-hidden dark:bg-gray-800/50">
+            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-b-2 border-emerald-100 dark:border-emerald-900/30 pb-4">
+              <CardTitle className="text-lg font-black text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 Daftar Donasi Pending
               </CardTitle>
-              <CardDescription>
-                Klik nama donatur atau tombol <strong>Lihat Bukti</strong> untuk
+              <CardDescription className="dark:text-gray-400">
+                Klik nama donatur atau tombol <strong className="dark:text-gray-300">Lihat Bukti</strong> untuk
                 melihat bukti transfer sebelum menyetujui.
               </CardDescription>
             </CardHeader>
@@ -517,45 +523,48 @@ export default function AdminDonasiPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-gray-50 border-b-2 border-gray-100">
-                      <th className="text-left px-5 py-3.5 font-black text-gray-600 uppercase tracking-wider text-xs">
+                    <tr className="bg-gray-50/80 dark:bg-gray-800/80 border-b-2 border-gray-100 dark:border-gray-800">
+                      <th className="text-left px-5 py-3.5 font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs">
                         Donatur
                       </th>
-                      <th className="text-left px-5 py-3.5 font-black text-gray-600 uppercase tracking-wider text-xs">
+                      <th className="text-left px-5 py-3.5 font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs">
                         Kegiatan
                       </th>
-                      <th className="text-right px-5 py-3.5 font-black text-gray-600 uppercase tracking-wider text-xs">
+                      <th className="text-right px-5 py-3.5 font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs">
                         Nominal
                       </th>
-                      <th className="text-left px-5 py-3.5 font-black text-gray-600 uppercase tracking-wider text-xs">
+                      <th className="text-left px-5 py-3.5 font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs">
                         Tanggal
                       </th>
-                      <th className="text-left px-5 py-3.5 font-black text-gray-600 uppercase tracking-wider text-xs">
+                      <th className="text-left px-5 py-3.5 font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs">
                         Pesan
                       </th>
-                      <th className="text-center px-5 py-3.5 font-black text-gray-600 uppercase tracking-wider text-xs">
+                      <th className="text-center px-5 py-3.5 font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs">
                         Aksi
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {donations.map((donation) => (
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                    {(() => {
+                      const totalPages = Math.ceil(donations.length / D_PER_PAGE);
+                      const paginatedDonations = donations.slice((dPage - 1) * D_PER_PAGE, dPage * D_PER_PAGE);
+                      return paginatedDonations.map((donation) => (
                       <tr
                         key={donation.id}
-                        className="hover:bg-emerald-50/40 transition-colors group"
+                        className="hover:bg-emerald-50/40 dark:hover:bg-gray-800/50 transition-colors group"
                       >
                         {/* Donatur */}
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
-                              <User className="w-4 h-4 text-emerald-600" />
+                            <div className="w-9 h-9 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 rounded-full flex items-center justify-center flex-shrink-0">
+                              <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                             </div>
                             <div>
-                              <p className="font-bold text-gray-900 leading-tight">
+                              <p className="font-bold text-gray-900 dark:text-gray-100 leading-tight">
                                 {donation.donor_name || "Anonim"}
                               </p>
                               {donation.user?.email && (
-                                <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-0.5">
                                   <Mail className="w-3 h-3" />
                                   {donation.user.email}
                                 </p>
@@ -566,31 +575,31 @@ export default function AdminDonasiPage() {
 
                         {/* Kegiatan */}
                         <td className="px-5 py-4">
-                          <p className="font-semibold text-gray-800 max-w-[180px] truncate">
+                          <p className="font-semibold text-gray-800 dark:text-gray-200 max-w-[180px] truncate">
                             {donation.kegiatan?.title || "—"}
                           </p>
                         </td>
 
                         {/* Nominal */}
                         <td className="px-5 py-4 text-right">
-                          <span className="font-black text-emerald-700 text-base">
+                          <span className="font-black text-emerald-700 dark:text-emerald-400 text-base">
                             {formatCurrency(donation.amount)}
                           </span>
                         </td>
 
                         {/* Tanggal */}
                         <td className="px-5 py-4">
-                          <div className="flex items-center gap-1.5 text-gray-600">
-                            <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                          <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300">
+                            <Calendar className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
                             <span>{formatDate(donation.created_at)}</span>
                           </div>
                         </td>
 
                         {/* Pesan */}
                         <td className="px-5 py-4">
-                          <p className="text-gray-500 max-w-[140px] truncate text-xs">
+                          <p className="text-gray-500 dark:text-gray-400 max-w-[140px] truncate text-xs">
                             {donation.message || (
-                              <span className="italic text-gray-300">—</span>
+                              <span className="italic text-gray-300 dark:text-gray-600">—</span>
                             )}
                           </p>
                         </td>
@@ -602,7 +611,7 @@ export default function AdminDonasiPage() {
                               size="sm"
                               variant="outline"
                               onClick={() => openPreview(donation)}
-                              className="border-2 border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 font-semibold text-xs px-3 h-8"
+                              className="border-2 border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/40 font-semibold text-xs px-3 h-8"
                             >
                               <ImageIcon className="w-3.5 h-3.5 mr-1" />
                               Bukti
@@ -634,10 +643,49 @@ export default function AdminDonasiPage() {
                           </div>
                         </td>
                       </tr>
-                    ))}
+                    ))})()}
                   </tbody>
                 </table>
               </div>
+
+              {/* Pagination bar */}
+              {(() => {
+                const totalPages = Math.ceil(donations.length / D_PER_PAGE);
+                if (totalPages <= 1) return null;
+                return (
+                  <div className="border-t-2 border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 px-5 py-3 flex items-center justify-between">
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                      <span className="text-gray-800 dark:text-gray-200">{(dPage - 1) * D_PER_PAGE + 1}</span>
+                      {" – "}
+                      <span className="text-gray-800 dark:text-gray-200">{Math.min(dPage * D_PER_PAGE, donations.length)}</span>
+                      {" dari "}
+                      <span className="text-gray-800 dark:text-gray-200">{donations.length}</span>
+                      {" donasi pending"}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline" size="sm"
+                        onClick={() => setDPage(p => Math.max(1, p - 1))}
+                        disabled={dPage === 1}
+                        className="border-2 font-bold h-8 w-8 p-0 dark:border-gray-700 dark:hover:bg-gray-700"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </Button>
+                      <span className="text-sm font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg w-8 h-8 flex items-center justify-center">
+                        {dPage}
+                      </span>
+                      <Button
+                        variant="outline" size="sm"
+                        onClick={() => setDPage(p => Math.min(totalPages, p + 1))}
+                        disabled={dPage === totalPages}
+                        className="border-2 font-bold h-8 w-8 p-0 dark:border-gray-700 dark:hover:bg-gray-700"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })()}
             </CardContent>
           </Card>
         )}

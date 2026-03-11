@@ -354,11 +354,11 @@ export default function SmartFarmPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-200/20 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-teal-200/20 rounded-full blur-3xl animate-pulse-slow animation-delay-1000"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-200/20 dark:bg-emerald-900/20 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-teal-200/20 dark:bg-teal-900/20 rounded-full blur-3xl animate-pulse-slow animation-delay-1000"></div>
       </div>
 
       {/* Navbar */}
@@ -390,21 +390,21 @@ export default function SmartFarmPage() {
 
       {/* ── BMKG Weather Widget ────────────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
-        <Card className="border-2 border-emerald-100 shadow-2xl animate-fade-in-up animation-delay-300 overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
+        <Card className="border-2 border-emerald-100 dark:border-gray-800 dark:bg-gray-800 shadow-2xl animate-fade-in-up animation-delay-300 overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-800 border-b border-emerald-100 dark:border-gray-700">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-                <CardTitle className="flex items-center gap-2 text-xl font-black text-gray-900">
-                  <CloudRain className="w-6 h-6 text-emerald-600" />
+                <CardTitle className="flex items-center gap-2 text-xl font-black text-gray-900 dark:text-gray-100">
+                  <CloudRain className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                   Prakiraan Cuaca BMKG
                 </CardTitle>
-                <CardDescription className="flex items-center gap-1 mt-1">
+                <CardDescription className="flex items-center gap-1 mt-1 dark:text-gray-400">
                   <span>Data dari</span>
                   <a
                     href="https://www.bmkg.go.id"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-emerald-600 font-semibold hover:underline inline-flex items-center gap-1"
+                    className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline inline-flex items-center gap-1"
                   >
                     BMKG (Badan Meteorologi, Klimatologi, dan Geofisika)
                     <ExternalLink className="w-3 h-3" />
@@ -421,7 +421,7 @@ export default function SmartFarmPage() {
                       fetchBmkg();
                     }}
                     disabled={bmkgLoading}
-                    className="border-2 border-emerald-200 hover:bg-emerald-50 font-semibold h-9"
+                    className="border-2 border-emerald-200 dark:border-gray-700 dark:text-gray-300 hover:bg-emerald-50 dark:hover:bg-gray-800 font-semibold h-9"
                   >
                     <RefreshCw
                       className={`w-4 h-4 mr-2 ${bmkgLoading ? "animate-spin" : ""}`}
@@ -433,7 +433,7 @@ export default function SmartFarmPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => setIsBmkgExpanded(!isBmkgExpanded)}
-                  className="border-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50 h-9 w-9 p-0"
+                  className="border-2 border-emerald-200 dark:border-gray-700 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-gray-800 h-9 w-9 p-0"
                 >
                   {isBmkgExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                 </Button>
@@ -443,20 +443,20 @@ export default function SmartFarmPage() {
             {/* Kecamatan + Desa Selector (Only show if expanded) */}
             <div className={`flex flex-col sm:flex-row gap-3 mt-4 transition-all duration-300 opacity-100 h-auto`}>
               <div className="flex-1">
-                <label className="text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+                <label className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   Kecamatan
                 </label>
                 <Select
                   value={selectedKecamatan}
                   onValueChange={handleKecamatanChange}
                 >
-                  <SelectTrigger className="h-11 border-2 border-emerald-200 focus:border-emerald-500 bg-white font-semibold">
+                  <SelectTrigger className="h-11 border-2 border-emerald-200 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 focus:border-emerald-500 bg-white font-semibold flex items-center justify-between px-3 relative">
                     <SelectValue placeholder="Pilih kecamatan" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="dark:bg-gray-800 dark:border-gray-700 z-[100]">
                     {KECAMATAN_LIST.map((kec) => (
-                      <SelectItem key={kec} value={kec}>
+                      <SelectItem key={kec} value={kec} className="dark:text-gray-200 dark:focus:bg-gray-700">
                         {kec}
                       </SelectItem>
                     ))}
@@ -465,17 +465,17 @@ export default function SmartFarmPage() {
               </div>
 
               <div className="flex-1">
-                <label className="text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-teal-600" />
+                <label className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                   Desa / Kelurahan
                 </label>
                 <Select value={selectedDesa} onValueChange={setSelectedDesa}>
-                  <SelectTrigger className="h-11 border-2 border-emerald-200 focus:border-emerald-500 bg-white font-semibold">
+                  <SelectTrigger className="h-11 border-2 border-emerald-200 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 focus:border-emerald-500 bg-white font-semibold flex items-center justify-between px-3 relative">
                     <SelectValue placeholder="Pilih desa" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="dark:bg-gray-800 dark:border-gray-700 z-[100]">
                     {desaList.map((w) => (
-                      <SelectItem key={w.kode} value={w.kode}>
+                      <SelectItem key={w.kode} value={w.kode} className="dark:text-gray-200 dark:focus:bg-gray-700">
                         {w.desa}
                       </SelectItem>
                     ))}
@@ -489,8 +489,8 @@ export default function SmartFarmPage() {
               {/* Loading */}
             {bmkgLoading && (
               <div className="flex items-center justify-center py-10 gap-3">
-                <Loader2 className="w-6 h-6 animate-spin text-emerald-600" />
-                <span className="text-gray-600 font-semibold">
+                <Loader2 className="w-6 h-6 animate-spin text-emerald-600 dark:text-emerald-400" />
+                <span className="text-gray-600 dark:text-gray-400 font-semibold">
                   Mengambil data dari BMKG...
                 </span>
               </div>
@@ -498,16 +498,16 @@ export default function SmartFarmPage() {
 
             {/* Error */}
             {bmkgError && !bmkgLoading && (
-              <div className="flex items-center gap-3 p-4 bg-red-50 border-2 border-red-100 rounded-xl">
+              <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-100 dark:border-red-900 rounded-xl">
                 <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="font-bold text-red-800 text-sm">{bmkgError}</p>
+                  <p className="font-bold text-red-800 dark:text-red-400 text-sm">{bmkgError}</p>
                 </div>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={fetchBmkg}
-                  className="border-red-200 text-red-600 hover:bg-red-50"
+                  className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/40 border-2"
                 >
                   Coba lagi
                 </Button>
@@ -520,7 +520,7 @@ export default function SmartFarmPage() {
                 {/* Lokasi badge */}
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <Badge className="bg-emerald-100 text-emerald-800 border border-emerald-200 font-semibold px-3 py-1">
+                    <Badge className="bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-semibold px-3 py-1">
                       <MapPin className="w-3.5 h-3.5 mr-1" />
                       {selectedDesaEntry?.desa}, Kec.{" "}
                       {selectedDesaEntry?.kecamatan}
@@ -582,8 +582,8 @@ export default function SmartFarmPage() {
                 {/* 3-day hourly forecast */}
                 {next3Days.length > 0 && (
                   <div>
-                    <h3 className="font-black text-gray-900 text-base mb-3 flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-emerald-600" />
+                    <h3 className="font-black text-gray-900 dark:text-gray-100 text-base mb-3 flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       Prakiraan 3 Hari ke Depan
                     </h3>
                     <div className="space-y-3">
@@ -593,10 +593,10 @@ export default function SmartFarmPage() {
                         return (
                           <div
                             key={dayIdx}
-                            className="border-2 border-emerald-100 rounded-xl overflow-hidden"
+                            className="border-2 border-emerald-100 dark:border-gray-700 rounded-xl overflow-hidden"
                           >
-                            <div className="bg-emerald-50 px-4 py-2 border-b border-emerald-100">
-                              <p className="text-sm font-black text-emerald-800">
+                            <div className="bg-emerald-50 dark:bg-emerald-900/20 px-4 py-2 border-b border-emerald-100 dark:border-gray-700">
+                              <p className="text-sm font-black text-emerald-800 dark:text-emerald-400">
                                 {formatTanggal(firstEntry.local_datetime)}
                               </p>
                             </div>
@@ -605,9 +605,9 @@ export default function SmartFarmPage() {
                                 {dayForecast.map((f, idx) => (
                                   <div
                                     key={idx}
-                                    className="flex-shrink-0 w-28 p-3 text-center border-r border-gray-100 last:border-r-0 hover:bg-emerald-50/50 transition-colors"
+                                    className="flex-shrink-0 w-28 p-3 text-center border-r border-gray-100 dark:border-gray-700 last:border-r-0 hover:bg-emerald-50/50 dark:hover:bg-gray-700/50 transition-colors"
                                   >
-                                    <p className="text-xs text-gray-500 font-semibold mb-1">
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold mb-1">
                                       {formatJam(f.local_datetime)}
                                     </p>
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -619,10 +619,10 @@ export default function SmartFarmPage() {
                                         (e.currentTarget.style.display = "none")
                                       }
                                     />
-                                    <p className="text-base font-black text-gray-900 mt-1">
+                                    <p className="text-base font-black text-gray-900 dark:text-gray-100 mt-1">
                                       {f.t}°C
                                     </p>
-                                    <p className="text-xs text-gray-500 leading-tight mt-0.5">
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight mt-0.5">
                                       {f.weather_desc}
                                     </p>
                                     <div className="mt-1.5 flex flex-col gap-0.5">
@@ -650,13 +650,13 @@ export default function SmartFarmPage() {
                 </div>
 
                 {/* BMKG attribution */}
-                <p className="text-xs text-gray-400 border-t border-gray-100 pt-3">
+                <p className="text-xs text-gray-400 dark:text-gray-500 border-t border-gray-100 dark:border-gray-700 pt-3">
                   ⓘ Data prakiraan cuaca bersumber dari{" "}
                   <a
                     href="https://www.bmkg.go.id"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-emerald-600 font-semibold hover:underline"
+                    className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline"
                   >
                     BMKG (Badan Meteorologi, Klimatologi, dan Geofisika)
                   </a>{" "}
@@ -668,8 +668,8 @@ export default function SmartFarmPage() {
             {/* Initial state — no data yet */}
             {!bmkgData && !bmkgLoading && !bmkgError && (
               <div className="flex flex-col items-center justify-center py-8 text-center">
-                <CloudRain className="w-12 h-12 text-emerald-400 mb-3" />
-                <p className="text-gray-600 font-medium">
+                <CloudRain className="w-12 h-12 text-emerald-400 dark:text-emerald-600 mb-3" />
+                <p className="text-gray-600 dark:text-gray-400 font-medium">
                   Pilih kecamatan dan desa di atas untuk melihat prakiraan
                   cuaca.
                 </p>
@@ -684,7 +684,7 @@ export default function SmartFarmPage() {
         <div className="space-y-8">
           {/* Crop Selection */}
           <div className="animate-fade-in-up animation-delay-400">
-            <h2 className="text-3xl font-black text-gray-900 mb-6">
+            <h2 className="text-3xl font-black text-gray-900 dark:text-gray-100 mb-6">
               Pilih Jenis Tanaman
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -693,10 +693,10 @@ export default function SmartFarmPage() {
                   key={crop.id}
                   variant={selectedCrop === crop.id ? "default" : "outline"}
                   onClick={() => setSelectedCrop(crop.id)}
-                  className={`h-24 flex-col gap-2 cursor-pointer ${
+                  className={`h-24 flex-col gap-2 cursor-pointer transition-all ${
                     selectedCrop === crop.id
-                      ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold"
-                      : "border-2 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50 text-emerald-700 font-semibold"
+                      ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold border-0"
+                      : "border-2 border-emerald-200 dark:border-gray-700 hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-gray-800 text-emerald-700 dark:text-emerald-400 font-semibold bg-white dark:bg-gray-800"
                   }`}
                 >
                   <span className="text-4xl">{crop.icon}</span>
@@ -707,13 +707,13 @@ export default function SmartFarmPage() {
           </div>
 
           {/* Crop Tips */}
-          <Card className="border-2 border-emerald-100 shadow-2xl animate-fade-in-up animation-delay-500">
-            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50">
-              <CardTitle className="text-2xl font-black text-gray-900">
+          <Card className="border-2 border-emerald-100 dark:border-gray-800 dark:bg-gray-800 shadow-2xl animate-fade-in-up animation-delay-500">
+            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-800 border-b border-emerald-100 dark:border-gray-700">
+              <CardTitle className="text-2xl font-black text-gray-900 dark:text-gray-100">
                 Panduan Budidaya{" "}
                 {crops.find((c) => c.id === selectedCrop)?.name}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="dark:text-gray-400">
                 Tips dan trik untuk hasil panen maksimal
               </CardDescription>
             </CardHeader>
@@ -721,14 +721,14 @@ export default function SmartFarmPage() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Droplets className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Droplets className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-gray-900 mb-1">
+                      <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-1">
                         Penyiraman
                       </h3>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">
                         {cropTips[selectedCrop].watering}
                       </p>
                     </div>
@@ -736,14 +736,14 @@ export default function SmartFarmPage() {
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Leaf className="w-5 h-5 text-green-600" />
+                    <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Leaf className="w-5 h-5 text-green-600 dark:text-green-400" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-gray-900 mb-1">
+                      <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-1">
                         Pemupukan
                       </h3>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">
                         {cropTips[selectedCrop].fertilizer}
                       </p>
                     </div>
@@ -751,14 +751,14 @@ export default function SmartFarmPage() {
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Bug className="w-5 h-5 text-red-600" />
+                    <div className="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Bug className="w-5 h-5 text-red-600 dark:text-red-400" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-gray-900 mb-1">
+                      <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-1">
                         Pengendalian Hama
                       </h3>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">
                         {cropTips[selectedCrop].pestControl}
                       </p>
                     </div>
@@ -766,14 +766,14 @@ export default function SmartFarmPage() {
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Zap className="w-5 h-5 text-amber-600" />
+                    <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Zap className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-gray-900 mb-1">
+                      <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-1">
                         Waktu Panen
                       </h3>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">
                         {cropTips[selectedCrop].harvest}
                       </p>
                     </div>
@@ -784,8 +784,8 @@ export default function SmartFarmPage() {
           </Card>
 
           {/* AI Crop Recommendation Generator */}
-          <Card className="border-2 border-emerald-100 shadow-2xl animate-fade-in-up animation-delay-500 overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white relative">
+          <Card className="border-2 border-emerald-100 dark:border-gray-800 dark:bg-gray-800 shadow-2xl animate-fade-in-up animation-delay-500 overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-800 dark:to-teal-800 text-white relative">
               <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white to-transparent"></div>
               <div className="flex items-center gap-3 relative z-10">
                 <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
@@ -795,7 +795,7 @@ export default function SmartFarmPage() {
                   <CardTitle className="text-2xl font-black text-white">
                     Rekomendasi Tanam AI
                   </CardTitle>
-                  <CardDescription className="text-emerald-50">
+                  <CardDescription className="text-emerald-50 dark:text-gray-300">
                     Masukkan tanaman dan tanggal, atau biarkan kosong untuk
                     mendapatkan rekomendasi tanaman terbaik di lokasimu
                   </CardDescription>
@@ -805,30 +805,30 @@ export default function SmartFarmPage() {
             <CardContent className="p-6">
               <div className="grid md:grid-cols-2 gap-5 mb-6">
                 <div className="space-y-2">
-                  <Label className="text-sm font-bold text-gray-700">
-                    Nama Tanaman <span className="text-gray-400 font-normal">(opsional)</span>
+                  <Label className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                    Nama Tanaman <span className="text-gray-400 dark:text-gray-500 font-normal">(opsional)</span>
                   </Label>
                   <Input
                     placeholder="Contoh: Padi, Jagung, Cabai..."
                     value={recPlantName}
                     onChange={(e) => setRecPlantName(e.target.value)}
-                    className="border-2 focus-visible:ring-emerald-500 h-12"
+                    className="border-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 focus-visible:ring-emerald-500 h-12"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-bold text-gray-700">
-                    Tanggal Tanam <span className="text-gray-400 font-normal">(opsional)</span>
+                  <Label className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                    Tanggal Tanam <span className="text-gray-400 dark:text-gray-500 font-normal">(opsional)</span>
                   </Label>
                   <Input
                     type="date"
                     value={recPlantDate}
                     onChange={(e) => setRecPlantDate(e.target.value)}
-                    className="border-2 focus-visible:ring-emerald-500 h-12"
+                    className="border-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 focus-visible:ring-emerald-500 h-12"
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-between mb-8 py-4 border-y-2 border-emerald-50 border-dashed">
-                <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
+              <div className="flex items-center justify-between mb-8 py-4 border-y-2 border-emerald-50 dark:border-gray-700 border-dashed">
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 font-medium">
                   <MapPin className="w-4 h-4 text-emerald-500" />
                   Lokasi Terpilih: {selectedDesaEntry?.desa}, Kec.{" "}
                   {selectedDesaEntry?.kecamatan}
@@ -836,7 +836,7 @@ export default function SmartFarmPage() {
                 <Button
                   onClick={handleGenerateRecommendation}
                   disabled={recLoading}
-                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold h-12 px-8 shadow-lg shadow-emerald-200 transition-all transform hover:-translate-y-0.5"
+                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold h-12 px-8 shadow-lg shadow-emerald-200 dark:shadow-none transition-all transform hover:-translate-y-0.5"
                 >
                   {recLoading ? (
                     <>
@@ -854,13 +854,13 @@ export default function SmartFarmPage() {
 
               {/* Result Area */}
               {recResult && (
-                <div className="mt-6 bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-100 rounded-2xl p-6 shadow-inner relative overflow-hidden">
+                <div className="mt-6 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/10 dark:to-teal-900/10 border-2 border-emerald-100 dark:border-gray-700 rounded-2xl p-6 shadow-inner relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-200/20 rounded-bl-full -z-10 blur-xl"></div>
-                  <h3 className="text-lg font-black text-emerald-800 mb-4 flex items-center gap-2 border-b-2 border-emerald-100/50 pb-3">
+                  <h3 className="text-lg font-black text-emerald-800 dark:text-emerald-400 mb-4 flex items-center gap-2 border-b-2 border-emerald-100/50 dark:border-gray-700 pb-3">
                     <Leaf className="w-5 h-5" />
                     Hasil Analisis AI
                   </h3>
-                  <div className="prose prose-emerald prose-sm max-w-none text-gray-700 prose-p:leading-relaxed prose-li:my-1">
+                  <div className="prose prose-emerald prose-sm max-w-none text-gray-700 dark:text-gray-300 prose-p:leading-relaxed prose-li:my-1">
                     <p className="whitespace-pre-line leading-relaxed text-sm">
                       {recResult}
                     </p>
@@ -871,17 +871,17 @@ export default function SmartFarmPage() {
           </Card>
 
           {/* Farm Chat AI */}
-          <Card className="border-2 border-emerald-100 shadow-2xl animate-fade-in-up animation-delay-550">
-            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50">
+          <Card className="border-2 border-emerald-100 dark:border-gray-800 dark:bg-gray-800 shadow-2xl animate-fade-in-up animation-delay-550">
+            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-800 border-b border-emerald-100 dark:border-gray-700">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center">
                   <MessageCircle className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <CardTitle className="text-2xl font-black text-gray-900">
+                  <CardTitle className="text-2xl font-black text-gray-900 dark:text-gray-100">
                     Tanya AI Pertanian
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="dark:text-gray-400">
                     Tanyakan apapun tentang pertanian, peternakan, dan
                     pengelolaan lahan
                   </CardDescription>
@@ -890,7 +890,7 @@ export default function SmartFarmPage() {
             </CardHeader>
             <CardContent className="p-6">
               {chatMessages.length > 0 && (
-                <div className="space-y-4 mb-6 max-h-[400px] overflow-y-auto rounded-xl bg-gray-50 p-4 border border-gray-200">
+                <div className="space-y-4 mb-6 max-h-[400px] overflow-y-auto rounded-xl bg-gray-50 dark:bg-gray-900/50 p-4 border border-gray-200 dark:border-gray-700 custom-scrollbar">
                   {chatMessages.map((msg, idx) => (
                     <div
                       key={idx}
@@ -905,14 +905,14 @@ export default function SmartFarmPage() {
                         className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                           msg.role === "user"
                             ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white"
-                            : "bg-white border border-gray-200 text-gray-800"
+                            : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200"
                         }`}
                       >
                         <p className="whitespace-pre-line">{msg.text}</p>
                       </div>
                       {msg.role === "user" && (
-                        <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center shrink-0 mt-1">
-                          <User className="w-4 h-4 text-gray-600" />
+                        <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center shrink-0 mt-1">
+                          <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                         </div>
                       )}
                     </div>
@@ -922,9 +922,9 @@ export default function SmartFarmPage() {
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shrink-0">
                         <Bot className="w-4 h-4 text-white" />
                       </div>
-                      <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 flex items-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
-                        <span className="text-sm text-gray-500">
+                      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin text-emerald-600 dark:text-emerald-400" />
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
                           Sedang berpikir...
                         </span>
                       </div>
@@ -937,7 +937,7 @@ export default function SmartFarmPage() {
                   value={chatQuestion}
                   onChange={(e) => setChatQuestion(e.target.value)}
                   placeholder="Contoh: Bagaimana cara mengatasi hama wereng pada tanaman padi?"
-                  className="flex-1 border-2 focus:border-emerald-500 focus:ring-emerald-500 resize-none min-h-[48px] max-h-[120px]"
+                  className="flex-1 border-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 focus:border-emerald-500 focus:ring-emerald-500 resize-none min-h-[48px] max-h-[120px]"
                   rows={2}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {

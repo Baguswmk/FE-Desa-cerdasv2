@@ -191,11 +191,11 @@ export default function AdminUsersPage() {
     new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-violet-50/20 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-violet-50/20 dark:from-gray-900 dark:to-violet-900/20 relative overflow-hidden transition-colors duration-300">
       {/* Decorative */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-violet-200/20 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl animate-pulse-slow animation-delay-1000"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-violet-200/20 dark:bg-violet-900/20 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-200/20 dark:bg-purple-900/20 rounded-full blur-3xl animate-pulse-slow animation-delay-1000"></div>
       </div>
 
       <AdminNavbar />
@@ -206,27 +206,27 @@ export default function AdminUsersPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-violet-700 to-purple-700 bg-clip-text text-transparent">
+            <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-violet-700 to-purple-700 dark:from-violet-400 dark:to-purple-400 bg-clip-text text-transparent">
               Manajemen Pengguna
             </h1>
-            <p className="text-gray-500 text-sm mt-1 font-medium">Terdapat total {users.length} akun terdaftar di sistem</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 font-medium">Terdapat total {users.length} akun terdaftar di sistem</p>
           </div>
           <div className="flex gap-2 self-start sm:self-auto">
             <Button onClick={handleOpenAdd} className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold shadow-md transform hover:-translate-y-0.5 transition-all">
               <Plus className="w-4 h-4 mr-2" />Tambah Pengguna
             </Button>
-            <Button onClick={loadUsers} variant="outline" className="border-2 border-violet-200 hover:border-violet-400 hover:bg-violet-50 text-violet-700 font-semibold shadow-sm">
+            <Button onClick={loadUsers} variant="outline" className="border-2 border-violet-200 hover:border-violet-400 hover:bg-violet-50 dark:border-violet-800 dark:hover:border-violet-600 dark:hover:bg-violet-900/30 text-violet-700 dark:text-violet-400 font-semibold shadow-sm transition-colors duration-300">
               <RefreshCw className="w-4 h-4 mr-2" />Refresh Data
             </Button>
           </div>
         </div>
 
         {/* Filter Bar */}
-        <Card className="border-2 border-violet-100 shadow-lg mb-6">
+        <Card className="border-2 border-violet-100 dark:border-violet-900/50 shadow-lg mb-6 bg-white dark:bg-gray-800 transition-colors duration-300">
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                 <Input
                   placeholder="Cari berdasarkan nama, email, atau no. HP..."
                   value={search}
@@ -234,7 +234,7 @@ export default function AdminUsersPage() {
                     setSearch(e.target.value);
                     setCurrentPage(1); // Reset page on search
                   }}
-                  className="pl-9 border-2 border-violet-100 focus:border-violet-400 rounded-xl"
+                  className="pl-9 border-2 border-violet-100 dark:border-gray-700 focus:border-violet-400 dark:focus:border-violet-500 rounded-xl bg-transparent dark:text-gray-100"
                 />
               </div>
               <div className="flex gap-2 flex-wrap sm:flex-nowrap">
@@ -246,10 +246,10 @@ export default function AdminUsersPage() {
                       setCurrentPage(1); // Reset page on filter
                     }}
                     variant={statusFilter === s ? "default" : "outline"}
-                    className={`font-semibold text-sm flex-1 sm:flex-none rounded-xl ${
+                    className={`font-semibold text-sm flex-1 sm:flex-none rounded-xl transition-colors duration-300 ${
                       statusFilter === s 
-                      ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-md transform hover:-translate-y-0.5" 
-                      : "border-2 border-violet-100 hover:border-violet-300 text-gray-700"
+                      ? "bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-md transform hover:-translate-y-0.5" 
+                      : "border-2 border-violet-100 hover:border-violet-300 dark:border-violet-800 dark:hover:border-violet-600 dark:hover:bg-violet-900/30 text-gray-700 dark:text-gray-300 bg-transparent"
                     }`}
                   >
                     {s === "ALL" ? "Semua" : s === "ACTIVE" ? "🟢 Aktif" : "🔴 Diblokir"}
@@ -263,19 +263,19 @@ export default function AdminUsersPage() {
         {/* Loading */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <Loader2 className="w-12 h-12 text-violet-600 animate-spin" />
-            <p className="text-gray-500 font-semibold">Memuat data pengguna...</p>
+            <Loader2 className="w-12 h-12 text-violet-600 dark:text-violet-400 animate-spin" />
+            <p className="text-gray-500 dark:text-gray-400 font-semibold">Memuat data pengguna...</p>
           </div>
         )}
 
         {/* Error */}
         {!loading && error && (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center shadow-inner">
-              <AlertCircle className="w-8 h-8 text-red-500" />
+            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-2xl flex items-center justify-center shadow-inner">
+              <AlertCircle className="w-8 h-8 text-red-500 dark:text-red-400" />
             </div>
-            <p className="text-gray-700 font-semibold">{error}</p>
-            <Button onClick={loadUsers} variant="outline" className="border-2 border-violet-200 hover:border-violet-400 text-violet-700">
+            <p className="text-gray-700 dark:text-gray-300 font-semibold">{error}</p>
+            <Button onClick={loadUsers} variant="outline" className="border-2 border-violet-200 hover:border-violet-400 dark:border-violet-800 dark:hover:border-violet-600 dark:hover:bg-violet-900/30 text-violet-700 dark:text-violet-400 font-semibold transition-colors duration-300">
               <RefreshCw className="w-4 h-4 mr-2" />Coba Lagi
             </Button>
           </div>
@@ -283,25 +283,25 @@ export default function AdminUsersPage() {
 
         {/* Data Table */}
         {!loading && !error && (
-          <Card className="border-2 border-violet-100 shadow-xl overflow-hidden mb-6">
-            <CardHeader className="bg-gradient-to-r from-violet-50 to-purple-50 border-b-2 border-violet-100 pb-4">
+          <Card className="border-2 border-violet-100 dark:border-violet-900/50 shadow-xl overflow-hidden mb-6 bg-white dark:bg-gray-800 transition-colors duration-300">
+            <CardHeader className="bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/30 dark:to-purple-900/30 border-b-2 border-violet-100 dark:border-violet-800/50 pb-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-lg font-black text-gray-900 flex items-center gap-2">
-                    <Users className="w-5 h-5 text-violet-600" />
+                  <CardTitle className="text-lg font-black text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                    <Users className="w-5 h-5 text-violet-600 dark:text-violet-400" />
                     Daftar Pengguna
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="dark:text-gray-400">
                     Menampilkan {paginatedUsers.length} dari {filtered.length} pengguna
                   </CardDescription>
                 </div>
                 {/* Summary badges */}
                 <div className="hidden sm:flex items-center gap-2">
-                  <Badge className="bg-emerald-100/80 text-emerald-800 border-2 border-emerald-200 font-semibold px-3 py-1 text-xs">
+                  <Badge className="bg-emerald-100/80 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-400 border-2 border-emerald-200 dark:border-emerald-800/60 font-semibold px-3 py-1 text-xs">
                     <UserCheck className="w-3.5 h-3.5 mr-1" />
                     {users.filter(u => u.status === "ACTIVE").length} Aktif
                   </Badge>
-                  <Badge className="bg-red-100/80 text-red-800 border-2 border-red-200 font-semibold px-3 py-1 text-xs">
+                  <Badge className="bg-red-100/80 dark:bg-red-900/40 text-red-800 dark:text-red-400 border-2 border-red-200 dark:border-red-800/60 font-semibold px-3 py-1 text-xs">
                     <UserX className="w-3.5 h-3.5 mr-1" />
                     {users.filter(u => u.status === "BANNED").length} Diblokir
                   </Badge>
@@ -310,37 +310,36 @@ export default function AdminUsersPage() {
             </CardHeader>
             <CardContent className="p-0">
               {filtered.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 gap-3 bg-gray-50/50">
-                  <div className="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-2">
-                    <Search className="w-8 h-8 text-violet-400" />
+                <div className="flex flex-col items-center justify-center py-16 gap-3 bg-gray-50/50 dark:bg-gray-800/50">
+                  <div className="w-16 h-16 bg-violet-100 dark:bg-violet-900/30 rounded-full flex items-center justify-center mb-2 shadow-inner">
+                    <Search className="w-8 h-8 text-violet-400 dark:text-violet-500" />
                   </div>
-                  <p className="text-gray-600 font-bold text-lg">Tidak ada pengguna ditemukan</p>
+                  <p className="text-gray-600 dark:text-gray-300 font-bold text-lg">Tidak ada pengguna ditemukan</p>
                   <p className="text-gray-400 text-sm">Coba ubah kata kunci pencarian atau filter status.</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
+                  <table className="w-full text-sm text-left">
                     <thead>
-                      <tr className="bg-white border-b-2 border-violet-100">
-                        <th className="text-left px-5 py-4 font-black text-gray-600 uppercase tracking-widest text-xs">Pengguna</th>
-                        <th className="text-left px-5 py-4 font-black text-gray-600 uppercase tracking-widest text-xs">Kontak</th>
-                        <th className="text-left px-5 py-4 font-black text-gray-600 uppercase tracking-widest text-xs">Role / Status</th>
-                        <th className="text-left px-5 py-4 font-black text-gray-600 uppercase tracking-widest text-xs">Bergabung</th>
-                        <th className="text-center px-5 py-4 font-black text-gray-600 uppercase tracking-widest text-xs w-[140px]">Aksi</th>
+                      <tr className="bg-white dark:bg-gray-800 border-b-2 border-violet-100 dark:border-gray-700">
+                        <th className="px-5 py-4 font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest text-xs">Pengguna</th>
+                        <th className="px-5 py-4 font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest text-xs">Kontak</th>
+                        <th className="px-5 py-4 font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest text-xs">Role / Status</th>
+                        <th className="px-5 py-4 font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest text-xs">Bergabung</th>
+                        <th className="px-5 py-4 font-black text-gray-600 dark:text-gray-400 uppercase tracking-widest text-xs text-center w-[140px]">Aksi</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 bg-white">
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-800">
                       {paginatedUsers.map((u) => (
-                        <tr key={u.id} className={`hover:bg-violet-50/50 transition-colors group ${u.status === "BANNED" ? "bg-red-50/10" : ""}`}>
+                        <tr key={u.id} className={`hover:bg-violet-50/50 dark:hover:bg-gray-700/50 transition-colors group ${u.status === "BANNED" ? "bg-red-50/10 dark:bg-red-900/10" : ""}`}>
                           {/* Nama */}
                           <td className="px-5 py-4">
                             <div className="flex items-center gap-3">
-                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-black shadow-sm shrink-0 ${u.status === "BANNED" ? "bg-gradient-to-br from-red-400 to-rose-500" : "bg-gradient-to-br from-violet-500 to-purple-600"}`}>
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-black shadow-sm shrink-0 ${u.status === "BANNED" ? "bg-gradient-to-br from-red-400 to-rose-500" : "bg-gradient-to-br from-violet-500 to-purple-600 dark:from-violet-600 dark:to-purple-700"}`}>
                                 {u.nama[0].toUpperCase()}
                               </div>
                               <div>
-                                <p className="font-bold text-gray-900">{u.nama}</p>
-                                {/* <p className="text-xs text-gray-400 font-mono mt-0.5">ID: {u.id.substring(0,8)}...</p> */}
+                                <p className="font-bold text-gray-900 dark:text-gray-100">{u.nama}</p>
                               </div>
                             </div>
                           </td>
@@ -348,13 +347,13 @@ export default function AdminUsersPage() {
                           {/* Kontak */}
                           <td className="px-5 py-4">
                             <div className="space-y-1">
-                              <div className="flex items-center gap-2 text-xs text-gray-600">
-                                <Mail className="w-3.5 h-3.5 text-violet-400 shrink-0" />
+                              <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
+                                <Mail className="w-3.5 h-3.5 text-violet-400 dark:text-violet-500 shrink-0" />
                                 <span className="font-medium">{u.email}</span>
                               </div>
                               {u.no_hp && (
-                                <div className="flex items-center gap-2 text-xs text-gray-600">
-                                  <Phone className="w-3.5 h-3.5 text-violet-400 shrink-0" />
+                                <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
+                                  <Phone className="w-3.5 h-3.5 text-violet-400 dark:text-violet-500 shrink-0" />
                                   <span className="font-medium">{u.no_hp}</span>
                                 </div>
                               )}
@@ -364,12 +363,12 @@ export default function AdminUsersPage() {
                           {/* Role & Status */}
                           <td className="px-5 py-4 space-y-2">
                             <div>
-                               <Badge className={`text-[10px] font-black tracking-wider uppercase ${u.role === "admin" ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-blue-100 text-blue-800 border-blue-300"}`}>
+                               <Badge className={`text-[10px] font-black tracking-wider uppercase ${u.role === "admin" ? "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/40 dark:text-amber-400 dark:border-amber-800" : "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/40 dark:text-blue-400 dark:border-blue-800"}`}>
                                 {u.role}
                               </Badge>
                             </div>
                             <div>
-                              <Badge className={`text-xs font-bold ${u.status === "ACTIVE" ? "bg-emerald-100 text-emerald-800 border border-emerald-300" : "bg-red-100 text-red-800 border border-red-300"}`}>
+                              <Badge className={`text-xs font-bold ${u.status === "ACTIVE" ? "bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-900/40 dark:text-emerald-400 dark:border-emerald-800" : "bg-red-100 text-red-800 border border-red-300 dark:bg-red-900/40 dark:text-red-400 dark:border-red-800"}`}>
                                 {u.status === "ACTIVE" ? "🟢 Aktif" : "🔴 Diblokir"}
                               </Badge>
                             </div>
@@ -377,8 +376,8 @@ export default function AdminUsersPage() {
 
                           {/* Tanggal */}
                           <td className="px-5 py-4">
-                            <div className="flex items-center gap-1.5 text-gray-600 text-xs font-medium">
-                              <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                            <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300 text-xs font-medium">
+                              <Calendar className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
                               <span>{formatDate(u.created_at)}</span>
                             </div>
                           </td>
@@ -393,8 +392,8 @@ export default function AdminUsersPage() {
                                   disabled={updatingId === u.id}
                                   className={`w-full font-bold text-xs shadow-sm transition-all ${
                                     u.status === "ACTIVE"
-                                    ? "bg-red-50 hover:bg-red-100 text-red-700 border-2 border-red-200 hover:border-red-400"
-                                    : "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-2 border-emerald-200 hover:border-emerald-400"
+                                    ? "bg-red-50 hover:bg-red-100 text-red-700 border-2 border-red-200 hover:border-red-400 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400 dark:border-red-800/50"
+                                    : "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-2 border-emerald-200 hover:border-emerald-400 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40 dark:text-emerald-400 dark:border-emerald-800/50"
                                   }`}
                                   variant="outline"
                                 >
@@ -409,14 +408,14 @@ export default function AdminUsersPage() {
                                 </Button>
                               ) : (
                                 <div className="text-center w-full">
-                                  <span className="text-xs font-bold text-gray-400 bg-gray-100 px-3 py-1 rounded-full block">System Admin</span>
+                                  <span className="text-xs font-bold text-gray-400 bg-gray-100 dark:bg-gray-700 dark:text-gray-400 px-3 py-1 rounded-full block">System Admin</span>
                                 </div>
                               )}
                               <Button
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleOpenEdit(u)}
-                                className="w-full font-bold text-xs shadow-sm border-2 border-gray-200 hover:border-violet-400 hover:bg-violet-50 hover:text-violet-700 text-gray-600 transition-all"
+                                className="w-full font-bold text-xs shadow-sm border-2 border-gray-200 hover:border-violet-400 hover:bg-violet-50 hover:text-violet-700 dark:border-gray-700 dark:hover:border-violet-600 dark:hover:bg-violet-900/30 dark:text-gray-300 dark:hover:text-violet-300 transition-all"
                               >
                                 <Edit className="w-3.5 h-3.5 mr-1.5" /> Edit
                               </Button>
@@ -425,7 +424,7 @@ export default function AdminUsersPage() {
                                   size="sm"
                                   variant="outline"
                                   onClick={() => setDeleteModal({ userId: u.id, name: u.nama })}
-                                  className="w-full font-bold text-xs shadow-sm border-2 border-red-100 hover:border-red-400 hover:bg-red-50 hover:text-red-700 text-red-500 transition-all"
+                                  className="w-full font-bold text-xs shadow-sm border-2 border-red-100 hover:border-red-400 hover:bg-red-50 hover:text-red-700 dark:border-red-900/50 dark:hover:border-red-700 dark:hover:bg-red-900/30 dark:text-red-400 transition-all"
                                 >
                                   <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Hapus
                                 </Button>
@@ -441,9 +440,9 @@ export default function AdminUsersPage() {
               
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="border-t-2 border-violet-100 bg-gray-50/50 p-4 flex items-center justify-between">
-                  <p className="text-xs font-semibold text-gray-500">
-                    Menampilkan <span className="text-gray-900">{(currentPage - 1) * itemsPerPage + 1}</span> - <span className="text-gray-900">{Math.min(currentPage * itemsPerPage, filtered.length)}</span> dari <span className="text-gray-900">{filtered.length}</span> data
+                <div className="border-t-2 border-violet-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/80 p-4 flex items-center justify-between">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                    Menampilkan <span className="text-gray-900 dark:text-gray-100">{(currentPage - 1) * itemsPerPage + 1}</span> - <span className="text-gray-900 dark:text-gray-100">{Math.min(currentPage * itemsPerPage, filtered.length)}</span> dari <span className="text-gray-900 dark:text-gray-100">{filtered.length}</span> data
                   </p>
                   <div className="flex gap-2">
                     <Button
@@ -451,12 +450,12 @@ export default function AdminUsersPage() {
                       size="sm"
                       onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                      className="border-2 font-bold"
+                      className="border-2 font-bold dark:border-gray-600 dark:hover:bg-gray-700"
                     >
                       <ChevronLeft className="w-4 h-4 mr-1" />
                       Prev
                     </Button>
-                    <div className="flex items-center justify-center min-w-[32px] font-black text-sm text-violet-700 bg-violet-100 rounded-md">
+                    <div className="flex items-center justify-center min-w-[32px] font-black text-sm text-violet-700 dark:text-violet-300 bg-violet-100 dark:bg-violet-900/50 rounded-md">
                       {currentPage}
                     </div>
                     <Button
@@ -464,7 +463,7 @@ export default function AdminUsersPage() {
                       size="sm"
                       onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
-                      className="border-2 font-bold"
+                      className="border-2 font-bold dark:border-gray-600 dark:hover:bg-gray-700"
                     >
                       Next
                       <ChevronRight className="w-4 h-4 ml-1" />
@@ -480,20 +479,20 @@ export default function AdminUsersPage() {
       {/* Confirmation Modal */}
       {confirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setConfirmModal(null)} />
-          <div className="relative bg-white rounded-2xl shadow-2xl border-2 border-gray-100 w-full max-w-md animate-in zoom-in-95 duration-200">
-            <div className={`p-6 border-b-2 rounded-t-2xl ${confirmModal.action === "BANNED" ? "border-red-100 bg-red-50/50" : "border-emerald-100 bg-emerald-50/50"}`}>
+          <div className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm" onClick={() => setConfirmModal(null)} />
+          <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-gray-100 dark:border-gray-700 w-full max-w-md animate-in zoom-in-95 duration-200">
+            <div className={`p-6 border-b-2 rounded-t-2xl ${confirmModal.action === "BANNED" ? "border-red-100 bg-red-50/50 dark:border-red-900/50 dark:bg-red-900/20" : "border-emerald-100 bg-emerald-50/50 dark:border-emerald-900/50 dark:bg-emerald-900/20"}`}>
               <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner ${confirmModal.action === "BANNED" ? "bg-red-100" : "bg-emerald-100"}`}>
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner ${confirmModal.action === "BANNED" ? "bg-red-100 dark:bg-red-900/40" : "bg-emerald-100 dark:bg-emerald-900/40"}`}>
                   {confirmModal.action === "BANNED"
-                    ? <ShieldOff className="w-7 h-7 text-red-600" />
-                    : <ShieldCheck className="w-7 h-7 text-emerald-600" />}
+                    ? <ShieldOff className="w-7 h-7 text-red-600 dark:text-red-400" />
+                    : <ShieldCheck className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />}
                 </div>
                 <div>
-                  <h3 className={`text-xl font-black mb-1 ${confirmModal.action === "BANNED" ? "text-red-800" : "text-emerald-800"}`}>
+                  <h3 className={`text-xl font-black mb-1 ${confirmModal.action === "BANNED" ? "text-red-800 dark:text-red-400" : "text-emerald-800 dark:text-emerald-400"}`}>
                     {confirmModal.action === "BANNED" ? "Blokir Akses Akun?" : "Aktifkan Akses Akun?"}
                   </h3>
-                  <p className="text-sm font-bold text-gray-900">
+                  <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
                     {confirmModal.name}
                   </p>
                 </div>
@@ -501,7 +500,7 @@ export default function AdminUsersPage() {
             </div>
             
             <div className="p-6">
-              <div className={`p-4 rounded-xl border-l-4 mb-6 ${confirmModal.action === "BANNED" ? "bg-red-50 border-red-400 text-red-900" : "bg-emerald-50 border-emerald-400 text-emerald-900"}`}>
+              <div className={`p-4 rounded-xl border-l-4 mb-6 ${confirmModal.action === "BANNED" ? "bg-red-50 border-red-400 text-red-900 dark:bg-red-900/20 dark:border-red-500 dark:text-red-300" : "bg-emerald-50 border-emerald-400 text-emerald-900 dark:bg-emerald-900/20 dark:border-emerald-500 dark:text-emerald-300"}`}>
                 <p className="text-sm font-medium leading-relaxed">
                   {confirmModal.action === "BANNED"
                     ? `Akun ini akan diblokir dari sistem. Pengguna tidak akan bisa melakukan login atau mengakses fitur desa. Tindakan ini bisa dibatalkan nanti.`
@@ -512,7 +511,7 @@ export default function AdminUsersPage() {
                 <Button
                   onClick={() => setConfirmModal(null)}
                   variant="outline"
-                  className="flex-1 border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-bold py-6 text-base shadow-sm"
+                  className="flex-1 border-2 border-gray-200 hover:border-gray-300 text-gray-700 dark:border-gray-600 dark:hover:border-gray-500 dark:text-gray-300 dark:hover:bg-gray-700 font-bold py-6 text-base shadow-sm"
                 >
                   Batalkan
                 </Button>
@@ -526,7 +525,7 @@ export default function AdminUsersPage() {
                   }`}
                 >
                   {updatingId ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
-                  {confirmModal.action === "BANNED" ? "Ya, Blokir Cepat" : "Ya, Aktifkan Penuh"}
+                  {confirmModal.action === "BANNED" ? "Ya, Blokir" : "Ya, Aktifkan"}
                 </Button>
               </div>
             </div>
@@ -537,23 +536,23 @@ export default function AdminUsersPage() {
       {/* Delete Confirm Modal */}
       {deleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !deleting && setDeleteModal(null)} />
-          <div className="relative bg-white rounded-2xl shadow-2xl border-2 border-red-100 w-full max-w-md animate-in zoom-in-95 duration-200">
-            <div className="p-6 border-b-2 border-red-100 bg-red-50/50 rounded-t-2xl">
+          <div className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm" onClick={() => !deleting && setDeleteModal(null)} />
+          <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-red-100 dark:border-red-900 w-full max-w-md animate-in zoom-in-95 duration-200">
+            <div className="p-6 border-b-2 border-red-100 dark:border-red-900/50 bg-red-50/50 dark:bg-red-900/20 rounded-t-2xl">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner bg-red-100">
-                  <Trash2 className="w-7 h-7 text-red-600" />
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner bg-red-100 dark:bg-red-900/40">
+                  <Trash2 className="w-7 h-7 text-red-600 dark:text-red-400" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black mb-1 text-red-800">Hapus Pengguna?</h3>
-                  <p className="text-sm font-bold text-gray-900">{deleteModal.name}</p>
+                  <h3 className="text-xl font-black mb-1 text-red-800 dark:text-red-400">Hapus Pengguna?</h3>
+                  <p className="text-sm font-bold text-gray-900 dark:text-gray-100">{deleteModal.name}</p>
                 </div>
               </div>
             </div>
             <div className="p-6">
-              <div className="p-4 rounded-xl border-l-4 mb-6 bg-red-50 border-red-400 text-red-900">
+              <div className="p-4 rounded-xl border-l-4 mb-6 bg-red-50 border-red-400 text-red-900 dark:bg-red-900/20 dark:border-red-500 dark:text-red-300">
                 <p className="text-sm font-medium leading-relaxed">
-                  Akun pengguna ini akan dihapus secara permanen dari sistem. Tindakan ini <strong>tidak bisa dibatalkan</strong>.
+                  Akun pengguna ini akan dihapus secara permanen dari sistem. Tindakan ini <strong className="dark:text-white">tidak bisa dibatalkan</strong>.
                 </p>
               </div>
               <div className="flex gap-3">
@@ -561,7 +560,7 @@ export default function AdminUsersPage() {
                   onClick={() => setDeleteModal(null)}
                   variant="outline"
                   disabled={deleting}
-                  className="flex-1 border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-bold py-6 text-base shadow-sm"
+                  className="flex-1 border-2 border-gray-200 hover:border-gray-300 text-gray-700 dark:border-gray-600 dark:hover:border-gray-500 dark:text-gray-300 dark:hover:bg-gray-700 font-bold py-6 text-base shadow-sm"
                 >
                   Batalkan
                 </Button>
@@ -571,7 +570,7 @@ export default function AdminUsersPage() {
                   className="flex-1 font-black py-6 text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white"
                 >
                   {deleting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Trash2 className="w-5 h-5 mr-2" />}
-                  Ya, Hapus Permanen
+                  Ya, Hapus
                 </Button>
               </div>
             </div>
@@ -582,64 +581,64 @@ export default function AdminUsersPage() {
       {/* Form Modal (Create / Edit) */}
       {showFormModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !formSubmitting && setShowFormModal(false)} />
-          <div className="relative bg-white rounded-2xl shadow-2xl border-2 border-violet-100 w-full max-w-lg max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-200">
-            <div className="p-6 border-b-2 border-violet-100 bg-gradient-to-r from-violet-50 flex items-center justify-between sticky top-0 z-10">
+          <div className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm" onClick={() => !formSubmitting && setShowFormModal(false)} />
+          <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-violet-100 dark:border-violet-900/50 w-full max-w-lg max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-200">
+            <div className="p-6 border-b-2 border-violet-100 dark:border-violet-800/50 bg-gradient-to-r from-violet-50 dark:from-violet-900/30 flex items-center justify-between sticky top-0 z-10">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
-                  {editingUser ? <Edit className="w-5 h-5 text-violet-600" /> : <Plus className="w-5 h-5 text-violet-600" />}
+                <div className="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center">
+                  {editingUser ? <Edit className="w-5 h-5 text-violet-600 dark:text-violet-400" /> : <Plus className="w-5 h-5 text-violet-600 dark:text-violet-400" />}
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-gray-900 leading-tight">
+                  <h3 className="text-xl font-black text-gray-900 dark:text-gray-100 leading-tight">
                     {editingUser ? "Edit Pengguna" : "Tambah Pengguna Baru"}
                   </h3>
-                  <p className="text-xs text-gray-500 font-medium">Isi formulir di bawah dengan lengkap</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Isi formulir di bawah dengan lengkap</p>
                 </div>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => setShowFormModal(false)} disabled={formSubmitting} className="rounded-xl hover:bg-red-50 hover:text-red-500">
+              <Button variant="ghost" size="icon" onClick={() => setShowFormModal(false)} disabled={formSubmitting} className="rounded-xl hover:bg-red-50 hover:text-red-500 dark:text-gray-400 dark:hover:bg-red-900/30 dark:hover:text-red-400">
                 <X className="w-5 h-5" />
               </Button>
             </div>
             
             <form onSubmit={handleFormSubmit} className="p-6 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-gray-700">Nama Lengkap</label>
-                <Input required value={formData.nama} onChange={(e) => setFormData({...formData, nama: e.target.value})} className="border-2 border-violet-100 focus:border-violet-500 transition-all rounded-xl" placeholder="Ahmad Budi..." />
+                <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Nama Lengkap</label>
+                <Input required value={formData.nama} onChange={(e) => setFormData({...formData, nama: e.target.value})} className="border-2 border-violet-100 dark:border-gray-700 bg-transparent dark:text-gray-100 focus:border-violet-500 dark:focus:border-violet-500 transition-all rounded-xl" placeholder="Ahmad Budi..." />
               </div>
               
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-gray-700">Email</label>
-                <Input required type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="border-2 border-violet-100 focus:border-violet-500 transition-all rounded-xl" placeholder="budi@example.com" />
+                <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Email</label>
+                <Input required type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="border-2 border-violet-100 dark:border-gray-700 bg-transparent dark:text-gray-100 focus:border-violet-500 dark:focus:border-violet-500 transition-all rounded-xl" placeholder="budi@example.com" />
               </div>
               
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-gray-700">Password</label>
-                <Input required={!editingUser} type="password" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} className="border-2 border-violet-100 focus:border-violet-500 transition-all rounded-xl" placeholder={editingUser ? "Kosongkan jika tidak mengubah password" : "Minimal 6 karakter"} />
+                <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Password</label>
+                <Input required={!editingUser} type="password" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} className="border-2 border-violet-100 dark:border-gray-700 bg-transparent dark:text-gray-100 focus:border-violet-500 dark:focus:border-violet-500 transition-all rounded-xl" placeholder={editingUser ? "Kosongkan jika tidak mengubah password" : "Minimal 6 karakter"} />
               </div>
               
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-gray-700">Nomor HP</label>
-                <Input value={formData.no_hp} onChange={(e) => setFormData({...formData, no_hp: e.target.value})} className="border-2 border-violet-100 focus:border-violet-500 transition-all rounded-xl" placeholder="081234567890" />
+                <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Nomor HP</label>
+                <Input value={formData.no_hp} onChange={(e) => setFormData({...formData, no_hp: e.target.value})} className="border-2 border-violet-100 dark:border-gray-700 bg-transparent dark:text-gray-100 focus:border-violet-500 dark:focus:border-violet-500 transition-all rounded-xl" placeholder="081234567890" />
               </div>
 
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-gray-700">Role</label>
+                  <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Role</label>
                   <select 
                     value={formData.role} 
                     onChange={(e) => setFormData({...formData, role: e.target.value})}
-                    className="flex h-10 w-full items-center justify-between rounded-xl border-2 border-violet-100 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent font-medium text-gray-700"
+                    className="flex h-10 w-full items-center justify-between rounded-xl border-2 border-violet-100 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent font-medium text-gray-700 dark:text-gray-100"
                   >
                     <option value="WARGA">Warga</option>
                     <option value="ADMIN">Admin</option>
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-gray-700">Status</label>
+                  <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Status</label>
                   <select 
                     value={formData.status} 
                     onChange={(e) => setFormData({...formData, status: e.target.value})}
-                    className="flex h-10 w-full items-center justify-between rounded-xl border-2 border-violet-100 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent font-medium text-gray-700"
+                    className="flex h-10 w-full items-center justify-between rounded-xl border-2 border-violet-100 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent font-medium text-gray-700 dark:text-gray-100"
                   >
                     <option value="ACTIVE">Aktif</option>
                     <option value="BANNED">Diblokir</option>
@@ -648,7 +647,7 @@ export default function AdminUsersPage() {
               </div>
 
               <div className="pt-6 flex gap-3">
-                <Button type="button" onClick={() => setShowFormModal(false)} variant="outline" className="flex-1 font-bold border-2 rounded-xl h-11" disabled={formSubmitting}>Batal</Button>
+                <Button type="button" onClick={() => setShowFormModal(false)} variant="outline" className="flex-1 font-bold border-2 rounded-xl h-11 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700" disabled={formSubmitting}>Batal</Button>
                 <Button type="submit" disabled={formSubmitting} className="flex-1 font-black bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-md rounded-xl h-11">
                   {formSubmitting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                   {editingUser ? "Simpan Perubahan" : "Simpan Pengguna"}

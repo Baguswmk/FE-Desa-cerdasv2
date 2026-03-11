@@ -78,18 +78,18 @@ export default function TentangPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-200/20 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-teal-200/20 rounded-full blur-3xl animate-pulse-slow animation-delay-1000"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-200/20 dark:bg-emerald-900/20 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-teal-200/20 dark:bg-teal-900/20 rounded-full blur-3xl animate-pulse-slow animation-delay-1000"></div>
       </div>
 
       {/* Navbar */}
       <Navbar currentPage="tentang" />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 py-20 animate-fade-in">
+      <section className="relative overflow-hidden bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 dark:from-emerald-900 dark:via-teal-900 dark:to-green-900 py-20 animate-fade-in">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse-slow"></div>
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse-slow animation-delay-1000"></div>
@@ -116,15 +116,15 @@ export default function TentangPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
         {/* Mission & Vision */}
         <div className="grid md:grid-cols-2 gap-8 mb-16 animate-fade-in-up animation-delay-300">
-          <Card className="border-2 border-emerald-100 shadow-2xl hover:shadow-emerald-200 transition-all duration-300">
-            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-100">
-              <CardTitle className="flex items-center gap-3 text-2xl font-black text-gray-900">
-                <Target className="w-8 h-8 text-emerald-600" />
+          <Card className="border-2 border-emerald-100 dark:border-gray-800 dark:bg-gray-800 shadow-2xl hover:shadow-emerald-200 dark:hover:border-gray-700 transition-all duration-300">
+            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-800 border-b-2 border-emerald-100 dark:border-gray-700">
+              <CardTitle className="flex items-center gap-3 text-2xl font-black text-gray-900 dark:text-gray-100">
+                <Target className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
                 Visi Kami
               </CardTitle>
             </CardHeader>
             <CardContent className="p-8">
-              <p className="text-gray-700 text-lg leading-relaxed">
+              <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
                 Menjadi platform digital terdepan yang memberdayakan desa-desa
                 di Indonesia melalui teknologi, transparansi, dan partisipasi
                 aktif warga untuk mewujudkan desa yang maju, sejahtera, dan
@@ -133,30 +133,30 @@ export default function TentangPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-emerald-100 shadow-2xl hover:shadow-emerald-200 transition-all duration-300">
-            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-100">
-              <CardTitle className="flex items-center gap-3 text-2xl font-black text-gray-900">
-                <TrendingUp className="w-8 h-8 text-emerald-600" />
+          <Card className="border-2 border-emerald-100 dark:border-gray-800 dark:bg-gray-800 shadow-2xl hover:shadow-emerald-200 dark:hover:border-gray-700 transition-all duration-300">
+            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-800 border-b-2 border-emerald-100 dark:border-gray-700">
+              <CardTitle className="flex items-center gap-3 text-2xl font-black text-gray-900 dark:text-gray-100">
+                <TrendingUp className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
                 Misi Kami
               </CardTitle>
             </CardHeader>
             <CardContent className="p-8">
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <Shield className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">
+                  <Shield className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-1" />
+                  <span className="text-gray-700 dark:text-gray-300">
                     Meningkatkan transparansi pengelolaan dana desa
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Users className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">
+                  <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-1" />
+                  <span className="text-gray-700 dark:text-gray-300">
                     Memfasilitasi partisipasi aktif warga dalam pembangunan
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Zap className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">
+                  <Zap className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-1" />
+                  <span className="text-gray-700 dark:text-gray-300">
                     Menyediakan layanan digital yang mudah diakses
                   </span>
                 </li>
@@ -167,7 +167,7 @@ export default function TentangPage() {
 
         {/* Statistics */}
         <div className="mb-16 animate-fade-in-up animation-delay-400">
-          <h2 className="text-display font-black text-center bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent mb-8">
+          <h2 className="text-display font-black text-center bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent mb-8">
             Dampak Kami
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -176,14 +176,14 @@ export default function TentangPage() {
               return (
                 <Card
                   key={index}
-                  className="border-2 border-emerald-100 hover:border-emerald-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                  className="border-2 border-emerald-100 dark:border-gray-800 dark:bg-gray-800 hover:border-emerald-300 dark:hover:border-emerald-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
                 >
                   <CardContent className="p-6 text-center">
-                    <Icon className="w-10 h-10 text-emerald-600 mx-auto mb-3" />
-                    <div className="text-4xl font-black bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent mb-1">
+                    <Icon className="w-10 h-10 text-emerald-600 dark:text-emerald-400 mx-auto mb-3" />
+                    <div className="text-4xl font-black bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent mb-1">
                       {stat.value}
                     </div>
-                    <div className="text-sm font-semibold text-gray-600">
+                    <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">
                       {stat.label}
                     </div>
                   </CardContent>
@@ -195,7 +195,7 @@ export default function TentangPage() {
 
         {/* Features */}
         <div className="mb-16 animate-fade-in-up animation-delay-500">
-          <h2 className="text-display font-black text-center bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent mb-8">
+          <h2 className="text-display font-black text-center bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent mb-8">
             Fitur Unggulan
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -204,7 +204,7 @@ export default function TentangPage() {
               return (
                 <Card
                   key={index}
-                  className="border-2 border-emerald-100 hover:border-emerald-300 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
+                  className="border-2 border-emerald-100 dark:border-gray-800 dark:bg-gray-800 hover:border-emerald-300 dark:hover:border-emerald-500 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
                 >
                   <CardHeader>
                     <div className="flex items-start gap-4">
@@ -212,10 +212,10 @@ export default function TentangPage() {
                         <Icon className="w-7 h-7" />
                       </div>
                       <div className="flex-1">
-                        <CardTitle className="text-xl font-bold text-gray-900 mb-2">
+                        <CardTitle className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                           {feature.title}
                         </CardTitle>
-                        <p className="text-gray-600 leading-relaxed">
+                        <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                           {feature.description}
                         </p>
                       </div>
@@ -229,26 +229,26 @@ export default function TentangPage() {
 
         {/* Team */}
         <div className="mb-16 animate-fade-in-up animation-delay-600">
-          <h2 className="text-display font-black text-center bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent mb-8">
+          <h2 className="text-display font-black text-center bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent mb-8">
             Tim &amp; Kolaborasi
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             {team.map((member, index) => (
               <Card
                 key={index}
-                className="border-2 border-emerald-100 hover:border-emerald-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 text-center"
+                className="border-2 border-emerald-100 dark:border-gray-800 dark:bg-gray-800 hover:border-emerald-300 dark:hover:border-gray-700 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 text-center"
               >
                 <CardContent className="p-8">
                   <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full mx-auto mb-4 flex items-center justify-center">
                     <Users className="w-10 h-10 text-white" />
                   </div>
-                  <h3 className="text-xl font-black text-gray-900 mb-2">
+                  <h3 className="text-xl font-black text-gray-900 dark:text-gray-100 mb-2">
                     {member.name}
                   </h3>
-                  <Badge className="mb-3 bg-emerald-100 text-emerald-700 hover:bg-emerald-200">
+                  <Badge className="mb-3 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900/50">
                     {member.role}
                   </Badge>
-                  <p className="text-gray-600">{member.description}</p>
+                  <p className="text-gray-600 dark:text-gray-400">{member.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -256,34 +256,34 @@ export default function TentangPage() {
         </div>
 
         {/* Contact */}
-        <Card className="border-2 border-emerald-100 shadow-2xl animate-fade-in-up animation-delay-700">
-          <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-100">
-            <CardTitle className="text-2xl font-black text-gray-900 text-center">
+        <Card className="border-2 border-emerald-100 dark:border-gray-800 dark:bg-gray-800 shadow-2xl animate-fade-in-up animation-delay-700">
+          <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-800 border-b-2 border-emerald-100 dark:border-gray-700">
+            <CardTitle className="text-2xl font-black text-gray-900 dark:text-gray-100 text-center">
               Hubungi Kami
             </CardTitle>
           </CardHeader>
           <CardContent className="p-8">
             <div className="grid md:grid-cols-3 gap-6 text-center">
               <div>
-                <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-4 shadow-md">
                   <Mail className="w-7 h-7" />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">Email</h3>
-                <p className="text-gray-600">info@desacerdas.id</p>
+                <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-2">Email</h3>
+                <p className="text-gray-600 dark:text-gray-400">info@desacerdas.id</p>
               </div>
               <div>
-                <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-4 shadow-md">
                   <Phone className="w-7 h-7" />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">Telepon</h3>
-                <p className="text-gray-600">+62 21 1234 5678</p>
+                <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-2">Telepon</h3>
+                <p className="text-gray-600 dark:text-gray-400">+62 21 1234 5678</p>
               </div>
               <div>
-                <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-4 shadow-md">
                   <MapPin className="w-7 h-7" />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">Alamat</h3>
-                <p className="text-gray-600">Jakarta, Indonesia</p>
+                <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-2">Alamat</h3>
+                <p className="text-gray-600 dark:text-gray-400">Jakarta, Indonesia</p>
               </div>
             </div>
           </CardContent>

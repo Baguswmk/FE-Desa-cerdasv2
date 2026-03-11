@@ -90,17 +90,17 @@ export default function TanyaHukumPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-200/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-teal-200/20 rounded-full blur-3xl animate-pulse [animation-delay:1000ms]"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-200/20 dark:bg-emerald-900/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-teal-200/20 dark:bg-teal-900/20 rounded-full blur-3xl animate-pulse [animation-delay:1000ms]"></div>
       </div>
 
       <Navbar currentPage="tanya-hukum" />
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 py-16 lg:py-24">
+      <section className="relative overflow-hidden bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 dark:from-emerald-900 dark:via-teal-900 dark:to-green-900 py-16 lg:py-24">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
@@ -146,17 +146,17 @@ export default function TanyaHukumPage() {
       {/* ── MAIN CONTENT ── */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10 space-y-8">
         {/* ── ASK CARD ── */}
-        <Card className="border-2 border-emerald-100 hover:border-emerald-200 shadow-xl bg-white/80 backdrop-blur-sm transition-all duration-300">
+        <Card className="border-2 border-emerald-100 hover:border-emerald-200 dark:border-gray-800 dark:hover:border-gray-700 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-300">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg">
                 <MessageSquare className="w-6 h-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-2xl font-black text-gray-900">
+                <CardTitle className="text-2xl font-black text-gray-900 dark:text-gray-100">
                   Ajukan Pertanyaan Hukum
                 </CardTitle>
-                <CardDescription className="text-base text-gray-500 mt-0.5">
+                <CardDescription className="text-base text-gray-500 dark:text-gray-400 mt-0.5">
                   Ketik pertanyaan Anda tentang hukum atau prosedur administrasi
                   desa
                 </CardDescription>
@@ -173,7 +173,7 @@ export default function TanyaHukumPage() {
                 disabled={loading}
                 rows={5}
                 required
-                className="resize-none text-base leading-relaxed border-2 border-gray-200 focus:border-emerald-500 focus-visible:ring-emerald-500/20 bg-gray-50 rounded-xl placeholder:text-gray-400"
+                className="resize-none text-base leading-relaxed border-2 border-gray-200 dark:border-gray-700 focus:border-emerald-500 dark:focus:border-emerald-500 focus-visible:ring-emerald-500/20 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 rounded-xl placeholder:text-gray-400"
               />
 
               <Button
@@ -199,12 +199,12 @@ export default function TanyaHukumPage() {
 
         {/* ── THINKING DOTS ── */}
         {loading && (
-          <div className="flex items-center gap-3 px-4 text-gray-500 text-sm">
+          <div className="flex items-center gap-3 px-4 text-gray-500 dark:text-gray-400 text-sm">
             <div className="flex gap-1.5">
               {[0, 1, 2].map((i) => (
                 <span
                   key={i}
-                  className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce"
+                  className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-bounce"
                   style={{ animationDelay: `${i * 0.15}s` }}
                 />
               ))}
@@ -215,9 +215,9 @@ export default function TanyaHukumPage() {
 
         {/* ── ANSWER CARD ── */}
         {answered && answer && (
-          <Card className="border-2 border-emerald-200 shadow-2xl bg-white overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <Card className="border-2 border-emerald-200 dark:border-emerald-800 shadow-2xl bg-white dark:bg-gray-800 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Green header bar */}
-            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-4 flex items-center gap-3">
+            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-800 dark:to-teal-800 px-6 py-4 flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
@@ -226,7 +226,7 @@ export default function TanyaHukumPage() {
 
             <CardContent className="px-7 pt-6 pb-7 space-y-5">
               <p
-                className="text-gray-700 text-base leading-relaxed whitespace-pre-line [&_strong]:text-emerald-800 [&_strong]:font-semibold"
+                className="text-gray-700 dark:text-gray-300 text-base leading-relaxed whitespace-pre-line [&_strong]:text-emerald-800 dark:[&_strong]:text-emerald-400 [&_strong]:font-semibold"
                 dangerouslySetInnerHTML={{
                   __html: answer.replace(
                     /\*\*(.*?)\*\*/g,
@@ -235,12 +235,12 @@ export default function TanyaHukumPage() {
                 }}
               />
 
-              <div className="h-px bg-emerald-50" />
+              <div className="h-px bg-emerald-50 dark:bg-gray-700" />
 
               {/* Disclaimer */}
-              <div className="flex gap-3 rounded-xl bg-amber-50 border-2 border-amber-100 px-4 py-4">
+              <div className="flex gap-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-100 dark:border-amber-900/40 px-4 py-4">
                 <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                <p className="text-sm text-amber-800 leading-relaxed">
+                <p className="text-sm text-amber-800 dark:text-amber-400 leading-relaxed">
                   <strong>Disclaimer:</strong> Informasi ini bersifat umum dan
                   tidak menggantikan konsultasi hukum profesional. Untuk kasus
                   spesifik, harap konsultasi dengan ahli hukum atau petugas
@@ -252,15 +252,15 @@ export default function TanyaHukumPage() {
         )}
 
         {/* ── EXAMPLE QUESTIONS ── */}
-        <Card className="border-2 border-emerald-100 shadow-xl bg-white/80 backdrop-blur-sm">
+        <Card className="border-2 border-emerald-100 dark:border-gray-800 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-emerald-600" />
-              <CardTitle className="text-xl font-black text-gray-900">
+              <Sparkles className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <CardTitle className="text-xl font-black text-gray-900 dark:text-gray-100">
                 Contoh Pertanyaan
               </CardTitle>
             </div>
-            <CardDescription className="text-gray-500">
+            <CardDescription className="text-gray-500 dark:text-gray-400">
               Klik salah satu pertanyaan di bawah untuk memulai
             </CardDescription>
           </CardHeader>
@@ -273,9 +273,9 @@ export default function TanyaHukumPage() {
                   variant="outline"
                   onClick={() => setQuestion(q)}
                   disabled={loading}
-                  className="group w-full h-auto py-4 px-5 border-2 border-emerald-100 hover:border-emerald-400 hover:bg-emerald-50 text-gray-700 hover:text-emerald-800 font-normal text-sm text-left justify-start leading-snug transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer whitespace-normal break-words overflow-hidden"
+                  className="group w-full h-auto py-4 px-5 border-2 border-emerald-100 dark:border-gray-700 hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-gray-700 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-emerald-800 dark:hover:text-emerald-400 font-normal text-sm text-left justify-start leading-snug transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer whitespace-normal break-words overflow-hidden"
                 >
-                  <ChevronRight className="w-4 h-4 text-emerald-500 mr-2.5 shrink-0 transition-transform group-hover:translate-x-0.5" />
+                  <ChevronRight className="w-4 h-4 text-emerald-500 dark:text-emerald-400 mr-2.5 shrink-0 transition-transform group-hover:translate-x-0.5" />
                   <span className="break-words">{q}</span>
                 </Button>
               ))}
@@ -286,10 +286,10 @@ export default function TanyaHukumPage() {
         {/* ── FEATURES ── */}
         <div>
           <div className="text-center mb-8">
-            <h2 className="text-display font-black mb-3 bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
+            <h2 className="text-display font-black mb-3 bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
               Kenapa Layanan Ini?
             </h2>
-            <p className="text-gray-600 max-w-xl mx-auto">
+            <p className="text-gray-600 dark:text-gray-400 max-w-xl mx-auto">
               Teknologi AI untuk memudahkan akses informasi hukum bagi seluruh
               warga desa
             </p>
@@ -301,18 +301,18 @@ export default function TanyaHukumPage() {
               return (
                 <Card
                   key={index}
-                  className="group border-2 border-emerald-100 hover:border-emerald-400 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 bg-white/80 backdrop-blur-sm"
+                  className="group border-2 border-emerald-100 dark:border-gray-800 hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm"
                 >
                   <CardHeader>
                     <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white mb-3 shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
                       <Icon className="w-7 h-7" />
                     </div>
-                    <CardTitle className="text-lg font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">
+                    <CardTitle className="text-lg font-bold text-gray-900 dark:text-gray-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
                       {feature.title}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-600 text-sm leading-relaxed">
+                    <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
                       {feature.description}
                     </p>
                   </CardContent>

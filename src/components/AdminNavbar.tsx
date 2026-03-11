@@ -17,6 +17,7 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const navLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -34,7 +35,7 @@ export default function AdminNavbar() {
   const isActive = (href: string) => pathname === href || pathname?.startsWith(href + "/");
 
   return (
-    <nav className="relative z-20 bg-white/80 backdrop-blur-md shadow-lg border-b-2 border-emerald-100 sticky top-0">
+    <nav className="relative z-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-lg border-b-2 border-emerald-100 dark:border-emerald-900 sticky top-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-18">
           {/* Logo */}
@@ -46,10 +47,10 @@ export default function AdminNavbar() {
               <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
             <div>
-              <span className="text-base font-black bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
+              <span className="text-base font-black bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
                 Admin Panel
               </span>
-              <p className="text-xs text-gray-500 hidden sm:block leading-tight">Desa Cerdas</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block leading-tight">Desa Cerdas</p>
             </div>
           </Link>
 
@@ -62,10 +63,10 @@ export default function AdminNavbar() {
                 <Link key={link.href} href={link.href}>
                   <Button
                     variant="ghost"
-                    className={`relative font-semibold text-sm px-3 group cursor-pointer ${
+                    className={`relative font-semibold text-sm px-3 group cursor-pointer border-0 ${
                       active
-                        ? "text-emerald-700 bg-emerald-50"
-                        : "text-gray-600 hover:text-emerald-700 hover:bg-emerald-50"
+                        ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20"
+                        : "text-gray-600 dark:text-gray-300 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
                     }`}
                   >
                     <Icon className="w-4 h-4 mr-1.5" />
@@ -82,10 +83,11 @@ export default function AdminNavbar() {
           </div>
 
           {/* Desktop right */}
-          <div className="hidden lg:flex items-center gap-3 pl-4 border-l border-gray-200">
+          <div className="hidden lg:flex items-center gap-3 pl-4 border-l border-gray-200 dark:border-gray-800">
+            <ThemeToggle />
             {user && (
               <div className="text-right">
-                <p className="text-sm font-bold text-gray-900 leading-tight">{user.nama}</p>
+                <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight">{user.nama}</p>
                 <Badge className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold">
                   ADMIN
                 </Badge>
@@ -102,12 +104,14 @@ export default function AdminNavbar() {
 
           {/* Mobile hamburger */}
           <div className="flex items-center gap-2 lg:hidden">
+            <ThemeToggle />
             <Badge className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold hidden sm:flex">
               ADMIN
             </Badge>
             <Button
+              variant="outline"
               onClick={() => setOpen(!open)}
-              className="p-2 rounded-xl border-2 border-emerald-100 hover:bg-emerald-50 text-gray-700 transition-all"
+              className="p-2 rounded-xl border-2 border-emerald-100 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-gray-700 dark:text-gray-200 transition-all font-bold w-10 h-10"
             >
               {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
@@ -121,7 +125,7 @@ export default function AdminNavbar() {
           open ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="bg-white/95 border-t border-emerald-100 px-4 py-4 space-y-1">
+        <div className="bg-white/95 dark:bg-gray-900/95 border-t border-emerald-100 dark:border-gray-800 px-4 py-4 space-y-1">
           {user && (
             <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 rounded-xl mb-3">
               <div className="w-9 h-9 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-full flex items-center justify-center text-white text-sm font-black">
@@ -143,8 +147,8 @@ export default function AdminNavbar() {
                 onClick={() => setOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${
                   active
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
+                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-700 dark:hover:text-emerald-400"
                 }`}
               >
                 <Icon className="w-4 h-4" />

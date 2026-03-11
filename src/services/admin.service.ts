@@ -6,7 +6,7 @@ export const adminService = {
     return response.data;
   },
 
-  async getActivityLogs(limit: number = 50) {
+  async getActivityLogs(limit: number = 100) {
     const response = await api.get(`/admin/logs?limit=${limit}`);
     return response.data;
   },
