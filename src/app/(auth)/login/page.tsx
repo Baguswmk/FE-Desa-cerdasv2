@@ -243,13 +243,13 @@ export default function LoginPage() {
               </Link>
             </p>
 
-            <Alert className="border-2 border-amber-200 dark:border-amber-900/50 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30">
+            {/* <Alert className="border-2 border-amber-200 dark:border-amber-900/50 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30">
               <Sparkles className="h-4 w-4 text-amber-600 dark:text-amber-500" />
               <AlertDescription className="text-sm text-amber-900 dark:text-amber-400">
                 <strong>Demo Mode:</strong> Backend berjalan dalam demo mode.
                 API eksternal menggunakan data mock jika tidak dikonfigurasi.
               </AlertDescription>
-            </Alert>
+            </Alert> */}
           </CardFooter>
         </Card>
       </div>
