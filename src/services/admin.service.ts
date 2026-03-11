@@ -31,6 +31,11 @@ export const adminService = {
     return response.data;
   },
 
+  async deleteUser(userId: string) {
+    const response = await api.delete(`/admin/users/${userId}`);
+    return response.data;
+  },
+
   async exportDonations(
     format: "excel" | "pdf" = "excel",
     status: "APPROVED" | "PENDING" | "REJECTED" | "ALL" = "APPROVED",

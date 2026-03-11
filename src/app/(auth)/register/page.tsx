@@ -26,6 +26,7 @@ import {
   XCircle
 } from "lucide-react";
 import { authService, RegisterData } from "@/services/auth.service";
+import { toast } from "sonner";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -46,16 +47,23 @@ export default function RegisterPage() {
     setError("");
     
     if (formData.password !== confirmPassword) {
-      setError("Password dan konfirmasi password tidak sama");
+      const msg = "Password dan konfirmasi password tidak sama";
+      setError(msg);
+      toast.error(msg);
       return;
     }
     
     setLoading(true);
     try {
       const result = await authService.register(formData);
-      if (result.success) router.push("/warga/dashboard");
+      if (result.success) {
+        toast.success("Akun berhasil dibuat! Selamat datang 🎉");
+        router.push("/warga/dashboard");
+      }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Registrasi gagal. Silakan coba lagi.");
+      const msg = err.response?.data?.message || "Registrasi gagal. Silakan coba lagi.";
+      setError(msg);
+      toast.error(msg, { duration: 5000 });
     } finally {
       setLoading(false);
     }

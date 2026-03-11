@@ -51,7 +51,6 @@ interface Stats {
   total_dana?: number;
 }
 
-const categories = ["Semua", "Infrastruktur", "Kesehatan", "Pendidikan", "Sosial"];
 
 const features = [
   {
@@ -81,7 +80,6 @@ const features = [
 ];
 
 export default function KegiatanPage() {
-  const [activeFilter, setActiveFilter] = useState("Semua");
   const [activities, setActivities] = useState<Kegiatan[]>([]);
   const [stats, setStats] = useState<Stats>({});
   const [loading, setLoading] = useState(true);
@@ -124,10 +122,7 @@ export default function KegiatanPage() {
   const getImageUrl = (photo: string) =>
     `${process.env.NEXT_PUBLIC_API_URL?.replace("/api", "")}/uploads/${photo}`;
 
-  const filteredActivities =
-    activeFilter === "Semua"
-      ? activities
-      : activities.filter((a) => a.category === activeFilter);
+
 
   const totalDana = activities.reduce((sum, a) => sum + a.current_amount, 0);
   const activeCount = activities.filter((a) => a.status === "ACTIVE").length;
@@ -232,23 +227,7 @@ export default function KegiatanPage() {
             </p>
           </div>
 
-          {/* Filter Tabs */}
-          <div className="flex flex-wrap justify-center gap-3 mb-12">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={activeFilter === category ? "default" : "outline"}
-                onClick={() => setActiveFilter(category)}
-                className={`cursor-pointer ${
-                  activeFilter === category
-                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-full px-6 shadow-md"
-                    : "border-2 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50 text-emerald-700 font-semibold rounded-full px-6"
-                }`}
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
+
 
           {/* Loading State */}
           {loading && (
@@ -277,23 +256,19 @@ export default function KegiatanPage() {
           )}
 
           {/* Empty State */}
-          {!loading && !error && filteredActivities.length === 0 && (
+          {!loading && !error && activities.length === 0 && (
             <div className="flex flex-col items-center justify-center py-24 gap-4">
               <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center">
                 <ClipboardList className="w-8 h-8 text-emerald-500" />
               </div>
-              <p className="text-gray-700 font-semibold">
-                {activeFilter === "Semua"
-                  ? "Belum ada kegiatan tersedia."
-                  : `Tidak ada kegiatan untuk kategori "${activeFilter}".`}
-              </p>
+              <p className="text-gray-700 font-semibold">Belum ada kegiatan tersedia.</p>
             </div>
           )}
 
           {/* Activities Grid */}
-          {!loading && !error && filteredActivities.length > 0 && (
+          {!loading && !error && activities.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredActivities.map((activity) => (
+              {activities.map((activity) => (
                 <Card
                   key={activity.id}
                   className="group overflow-hidden border-2 border-emerald-100 hover:border-emerald-300 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 bg-white"

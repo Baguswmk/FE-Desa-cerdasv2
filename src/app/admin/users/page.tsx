@@ -30,11 +30,13 @@ import {
   Edit,
   Save,
   X,
+  Trash2,
 } from "lucide-react";
 import { adminService } from "@/services/admin.service";
 import { useAuth } from "@/hooks/useAuth";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import AdminNavbar from "@/components/AdminNavbar";
+import { toast } from "sonner";
 
 interface User {
   id: string;
@@ -63,6 +65,8 @@ export default function AdminUsersPage() {
   const [confirmModal, setConfirmModal] = useState<{ userId: string; action: "ACTIVE" | "BANNED"; name: string } | null>(null);
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [deleteModal, setDeleteModal] = useState<{ userId: string; name: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
   
   // Form State
   const [formData, setFormData] = useState({
@@ -99,8 +103,9 @@ export default function AdminUsersPage() {
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, status: newStatus } : u))
       );
+      toast.success(`Status pengguna berhasil diubah ke ${newStatus === "ACTIVE" ? "Aktif" : "Diblokir"}`);
     } catch (err: any) {
-      alert(err?.response?.data?.message ?? "Gagal mengubah status pengguna");
+      toast.error(err?.response?.data?.message ?? "Gagal mengubah status pengguna");
     } finally {
       setUpdatingId(null);
       setConfirmModal(null);
@@ -137,15 +142,32 @@ export default function AdminUsersPage() {
           delete (dataToSubmit as any).password;
         }
         await adminService.updateUser(editingUser.id, dataToSubmit);
+        toast.success("Data pengguna berhasil diperbarui");
       } else {
         await adminService.createUser(formData);
+        toast.success("Pengguna baru berhasil ditambahkan");
       }
       setShowFormModal(false);
       loadUsers(); // refresh data
     } catch(err: any) {
-      alert(err?.response?.data?.message || "Gagal menyimpan data pengguna");
+      toast.error(err?.response?.data?.message || "Gagal menyimpan data pengguna");
     } finally {
       setFormSubmitting(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deleteModal) return;
+    setDeleting(true);
+    try {
+      await adminService.deleteUser(deleteModal.userId);
+      setUsers((prev) => prev.filter((u) => u.id !== deleteModal.userId));
+      toast.success(`Pengguna "${deleteModal.name}" berhasil dihapus`);
+      setDeleteModal(null);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Gagal menghapus pengguna");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -398,6 +420,16 @@ export default function AdminUsersPage() {
                               >
                                 <Edit className="w-3.5 h-3.5 mr-1.5" /> Edit
                               </Button>
+                              {u.role !== "admin" && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setDeleteModal({ userId: u.id, name: u.nama })}
+                                  className="w-full font-bold text-xs shadow-sm border-2 border-red-100 hover:border-red-400 hover:bg-red-50 hover:text-red-700 text-red-500 transition-all"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Hapus
+                                </Button>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -495,6 +527,51 @@ export default function AdminUsersPage() {
                 >
                   {updatingId ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
                   {confirmModal.action === "BANNED" ? "Ya, Blokir Cepat" : "Ya, Aktifkan Penuh"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirm Modal */}
+      {deleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !deleting && setDeleteModal(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl border-2 border-red-100 w-full max-w-md animate-in zoom-in-95 duration-200">
+            <div className="p-6 border-b-2 border-red-100 bg-red-50/50 rounded-t-2xl">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner bg-red-100">
+                  <Trash2 className="w-7 h-7 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black mb-1 text-red-800">Hapus Pengguna?</h3>
+                  <p className="text-sm font-bold text-gray-900">{deleteModal.name}</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="p-4 rounded-xl border-l-4 mb-6 bg-red-50 border-red-400 text-red-900">
+                <p className="text-sm font-medium leading-relaxed">
+                  Akun pengguna ini akan dihapus secara permanen dari sistem. Tindakan ini <strong>tidak bisa dibatalkan</strong>.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setDeleteModal(null)}
+                  variant="outline"
+                  disabled={deleting}
+                  className="flex-1 border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-bold py-6 text-base shadow-sm"
+                >
+                  Batalkan
+                </Button>
+                <Button
+                  onClick={handleDeleteUser}
+                  disabled={deleting}
+                  className="flex-1 font-black py-6 text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white"
+                >
+                  {deleting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Trash2 className="w-5 h-5 mr-2" />}
+                  Ya, Hapus Permanen
                 </Button>
               </div>
             </div>
