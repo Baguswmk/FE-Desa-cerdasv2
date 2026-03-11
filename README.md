@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Village Management Frontend
+
+Frontend aplikasi manajemen desa berbasis **Next.js 16**, TypeScript, dan Tailwind CSS.
+
+## Features
+
+- ✅ **Authentication** — Login & register dengan JWT (role: Admin / Warga)
+- ✅ **Route Protection** — Protected layout per-role, server-side redirect di halaman `/`
+- ✅ **Public Pages** — Lihat kegiatan & tanya AI hukum
+- ✅ **Warga Dashboard** — Riwayat donasi, Smart Farm AI, profil
+- ✅ **Admin Dashboard** — Kelola kegiatan, verifikasi donasi, manajemen user
+- ✅ **Responsive Design** — Mobile-first, works on all devices
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **State Management**: React Context (Auth)
+- **API Client**: Axios (dengan interceptor JWT & 401 handling)
+- **Validation**: Zod (client-side forms)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- Backend API running on `http://localhost:5858`
+
+### Installation
 
 ```bash
+# Install dependencies
+npm install
+
+# Setup environment variables
+cp .env.local.example .env.local
+# Edit .env.local sesuai URL backend
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Aplikasi tersedia di `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/                  # Next.js App Router pages
+│   ├── (auth)/           # Login & Register (guest-only)
+│   ├── (public)/         # Public pages (kegiatan, tanya-hukum, smartfarm)
+│   ├── admin/            # Admin dashboard (role: ADMIN)
+│   └── warga/            # Warga dashboard (role: WARGA)
+├── components/
+│   ├── ui/               # Base UI components (Button, Card, LoadingScreen, dll.)
+│   ├── auth/             # AuthProvider & ProtectedRoute
+│   └── Navbar.tsx
+├── services/             # API service layer (per domain)
+├── hooks/                # useAuth
+├── types/                # Shared TypeScript types
+└── lib/                  # Axios instance & helpers
+```
 
-## Learn More
+## API Services
 
-To learn more about Next.js, take a look at the following resources:
+Semua API call dihandle melalui service files di `src/services/`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| File                   | Domain                            |
+| ---------------------- | --------------------------------- |
+| `auth.service.ts`      | Login, register, logout           |
+| `kegiatan.service.ts`  | Kegiatan desa                     |
+| `donasi.service.ts`    | Submit & kelola donasi            |
+| `ai.service.ts`        | Tanya AI hukum                    |
+| `smartfarm.service.ts` | Smart Farm AI                     |
+| `admin.service.ts`     | Admin dashboard & user management |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Routing
 
-## Deploy on Vercel
+### Public Routes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Path             | Deskripsi                     |
+| ---------------- | ----------------------------- |
+| `/kegiatan`      | Daftar kegiatan desa          |
+| `/kegiatan/[id]` | Detail kegiatan + form donasi |
+| `/tanya-hukum`   | AI Legal Q&A                  |
+| `/smartfarm`     | Smart Farm (public info)      |
+| `/login`         | Halaman login                 |
+| `/register`      | Halaman registrasi            |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Protected Routes
+
+**Warga** (`role: WARGA`):
+
+| Path               | Deskripsi       |
+| ------------------ | --------------- |
+| `/warga/dashboard` | Dashboard warga |
+| `/warga/donasi`    | Riwayat donasi  |
+| `/warga/smartfarm` | Kelola tanaman  |
+
+**Admin** (`role: ADMIN`):
+
+| Path               | Deskripsi             |
+| ------------------ | --------------------- |
+| `/admin/dashboard` | Dashboard statistik   |
+| `/admin/kegiatan`  | Kelola kegiatan       |
+| `/admin/donasi`    | Approve/reject donasi |
+| `/admin/users`     | Manajemen user        |
+
+## Development
+
+```bash
+npm run dev      # Dev server
+npm run build    # Production build
+npm run lint     # Lint
+```
+
+## License
+
+MIT
