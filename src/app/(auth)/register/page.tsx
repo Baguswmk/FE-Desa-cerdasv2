@@ -117,7 +117,7 @@ export default function RegisterPage() {
               </span>
             </Link>
 
-            <div className="flex items-center gap-2 text-sm z-10 w-full sm:w-auto justify-end absolute right-0 top-16 bg-white/95 dark:bg-gray-900/95 sm:bg-transparent sm:dark:bg-transparent p-4 sm:p-0 border-b sm:border-0 border-emerald-100 dark:border-gray-800 sm:static shadow-sm sm:shadow-none hidden md:flex">
+            {/* <div className="flex items-center gap-2 text-sm z-10 w-full sm:w-auto justify-end absolute right-0 top-16 bg-white/95 dark:bg-gray-900/95 sm:bg-transparent sm:dark:bg-transparent p-4 sm:p-0 border-b sm:border-0 border-emerald-100 dark:border-gray-800 sm:static shadow-sm sm:shadow-none hidden md:flex">
               <span className="text-gray-600 dark:text-gray-400 block sm:inline">Sudah punya akun?</span>
               <div className="flex items-center gap-3 mt-2 sm:mt-0">
                 <Link href="/login">
@@ -126,16 +126,16 @@ export default function RegisterPage() {
                   </Button>
                 </Link>
               </div>
-            </div>
+            </div> */}
             
-            <div className="md:hidden flex items-center gap-2">
+            {/* <div className="md:hidden flex items-center gap-2">
               <ThemeToggle />
               <Link href="/login">
                 <Button variant="outline" size="sm" className="font-semibold border-emerald-200 dark:border-emerald-900 text-emerald-700 dark:text-emerald-400">
                   Masuk
                 </Button>
               </Link>
-            </div>
+            </div> */}
             
             <div className="hidden md:block">
               <ThemeToggle />
