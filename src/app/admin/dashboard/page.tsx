@@ -214,7 +214,7 @@ export default function AdminDashboardPage() {
                     <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
                     <Tooltip
                       contentStyle={{ borderRadius: 12, border: "2px solid #d1fae5", fontWeight: 600 }}
-                      formatter={(v: number) => [v.toLocaleString("id-ID"), "Jumlah"]}
+                      formatter={(value: any) => [Number(value).toLocaleString("id-ID"), "Jumlah"]}
                     />
                     <Bar dataKey="value" radius={[6, 6, 0, 0]}>
                       {barData.map((entry, index) => (
@@ -251,7 +251,7 @@ export default function AdminDashboardPage() {
                         <Cell key={idx} fill={CHART_COLORS[idx * 2]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(v: number) => [v.toLocaleString("id-ID"), ""]} />
+                    <Tooltip formatter={(value: any) => [Number(value).toLocaleString("id-ID"), ""]} />
                     <Legend iconType="circle" iconSize={10} wrapperStyle={{ fontSize: 12, fontWeight: 600 }} />
                   </PieChart>
                 </ResponsiveContainer>
