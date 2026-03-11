@@ -374,10 +374,10 @@ export default function SmartFarmPage() {
           <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm border-2 border-white/30 rounded-2xl mb-6 animate-float">
             <Sprout className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-5xl lg:text-6xl font-black text-white mb-4 animate-fade-in-up animation-delay-200">
+          <h1 className="text-hero font-black text-white mb-4 animate-fade-in-up animation-delay-200">
             Smart Farm AI
           </h1>
-          <p className="text-xl text-emerald-50 mb-6 max-w-2xl mx-auto animate-fade-in-up animation-delay-300">
+          <p className="text-subtitle text-emerald-50 mb-6 max-w-2xl mx-auto animate-fade-in-up animation-delay-300">
             Platform pertanian cerdas berbasis AI untuk membantu petani desa
             meningkatkan hasil panen
           </p>
@@ -845,8 +845,8 @@ export default function SmartFarmPage() {
                     </>
                   ) : (
                     <>
-                      <Bot className="w-5 h-5 mr-2" />
-                      Generate Rekomendasi
+                      <Bot className="w-5 h-5 md:mr-2 " />
+                      <p className="text-sm hidden md:inline">Generate Rekomendasi</p>
                     </>
                   )}
                 </Button>

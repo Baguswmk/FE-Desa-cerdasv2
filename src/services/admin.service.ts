@@ -21,6 +21,16 @@ export const adminService = {
     return response.data;
   },
 
+  async createUser(data: any) {
+    const response = await api.post("/admin/users", data);
+    return response.data;
+  },
+
+  async updateUser(userId: string, data: any) {
+    const response = await api.put(`/admin/users/${userId}`, data);
+    return response.data;
+  },
+
   async exportDonations(
     format: "excel" | "pdf" = "excel",
     status: "APPROVED" | "PENDING" | "REJECTED" | "ALL" = "APPROVED",

@@ -38,12 +38,14 @@ const features = [
   {
     icon: Zap,
     title: "Respons Cepat",
-    description: "Dapatkan jawaban dalam hitungan detik dengan teknologi AI terkini.",
+    description:
+      "Dapatkan jawaban dalam hitungan detik dengan teknologi AI terkini.",
   },
   {
     icon: Shield,
     title: "Informasi Akurat",
-    description: "Berdasarkan regulasi dan prosedur hukum Indonesia yang berlaku.",
+    description:
+      "Berdasarkan regulasi dan prosedur hukum Indonesia yang berlaku.",
   },
   {
     icon: BookOpen,
@@ -79,7 +81,7 @@ export default function TanyaHukumPage() {
       setAnswered(true);
     } catch (error: any) {
       setAnswer(
-        `Error: ${error.response?.data?.message || "Gagal mendapatkan jawaban"}`
+        `Error: ${error.response?.data?.message || "Gagal mendapatkan jawaban"}`,
       );
       setAnswered(true);
     } finally {
@@ -121,11 +123,11 @@ export default function TanyaHukumPage() {
             <Scale className="w-10 h-10 text-white" />
           </div>
 
-          <h1 className="text-5xl lg:text-7xl font-black text-white mb-4 leading-tight">
+          <h1 className="text-hero font-black text-white mb-4 leading-tight">
             Konsultasi Hukum AI
           </h1>
 
-          <p className="text-xl text-emerald-50 mb-8 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-subtitle text-emerald-50 mb-8 max-w-2xl mx-auto">
             Dapatkan informasi hukum dan prosedur administrasi desa dengan
             bantuan AI assistant. Cepat, akurat, dan gratis.
           </p>
@@ -134,8 +136,7 @@ export default function TanyaHukumPage() {
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-6 py-2.5">
               <CheckCircle2 className="w-4 h-4 text-white" />
               <span className="text-white text-sm font-semibold">
-                Sisa kuota hari ini:{" "}
-                <strong>{quota} pertanyaan</strong>
+                Sisa kuota hari ini: <strong>{quota} pertanyaan</strong>
               </span>
             </div>
           )}
@@ -144,7 +145,6 @@ export default function TanyaHukumPage() {
 
       {/* ── MAIN CONTENT ── */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10 space-y-8">
-
         {/* ── ASK CARD ── */}
         <Card className="border-2 border-emerald-100 hover:border-emerald-200 shadow-xl bg-white/80 backdrop-blur-sm transition-all duration-300">
           <CardHeader className="pb-4">
@@ -157,7 +157,8 @@ export default function TanyaHukumPage() {
                   Ajukan Pertanyaan Hukum
                 </CardTitle>
                 <CardDescription className="text-base text-gray-500 mt-0.5">
-                  Ketik pertanyaan Anda tentang hukum atau prosedur administrasi desa
+                  Ketik pertanyaan Anda tentang hukum atau prosedur administrasi
+                  desa
                 </CardDescription>
               </div>
             </div>
@@ -227,7 +228,10 @@ export default function TanyaHukumPage() {
               <p
                 className="text-gray-700 text-base leading-relaxed whitespace-pre-line [&_strong]:text-emerald-800 [&_strong]:font-semibold"
                 dangerouslySetInnerHTML={{
-                  __html: answer.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
+                  __html: answer.replace(
+                    /\*\*(.*?)\*\*/g,
+                    "<strong>$1</strong>",
+                  ),
                 }}
               />
 
@@ -239,7 +243,8 @@ export default function TanyaHukumPage() {
                 <p className="text-sm text-amber-800 leading-relaxed">
                   <strong>Disclaimer:</strong> Informasi ini bersifat umum dan
                   tidak menggantikan konsultasi hukum profesional. Untuk kasus
-                  spesifik, harap konsultasi dengan ahli hukum atau petugas desa.
+                  spesifik, harap konsultasi dengan ahli hukum atau petugas
+                  desa.
                 </p>
               </div>
             </CardContent>
@@ -268,10 +273,10 @@ export default function TanyaHukumPage() {
                   variant="outline"
                   onClick={() => setQuestion(q)}
                   disabled={loading}
-                  className="group h-auto py-4 px-5 border-2 border-emerald-100 hover:border-emerald-400 hover:bg-emerald-50 text-gray-700 hover:text-emerald-800 font-normal text-sm text-left justify-start leading-snug transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
+                  className="group w-full h-auto py-4 px-5 border-2 border-emerald-100 hover:border-emerald-400 hover:bg-emerald-50 text-gray-700 hover:text-emerald-800 font-normal text-sm text-left justify-start leading-snug transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer whitespace-normal break-words overflow-hidden"
                 >
                   <ChevronRight className="w-4 h-4 text-emerald-500 mr-2.5 shrink-0 transition-transform group-hover:translate-x-0.5" />
-                  {q}
+                  <span className="break-words">{q}</span>
                 </Button>
               ))}
             </div>
@@ -281,11 +286,12 @@ export default function TanyaHukumPage() {
         {/* ── FEATURES ── */}
         <div>
           <div className="text-center mb-8">
-            <h2 className="text-3xl lg:text-4xl font-black mb-3 bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
+            <h2 className="text-display font-black mb-3 bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
               Kenapa Layanan Ini?
             </h2>
             <p className="text-gray-600 max-w-xl mx-auto">
-              Teknologi AI untuk memudahkan akses informasi hukum bagi seluruh warga desa
+              Teknologi AI untuk memudahkan akses informasi hukum bagi seluruh
+              warga desa
             </p>
           </div>
 

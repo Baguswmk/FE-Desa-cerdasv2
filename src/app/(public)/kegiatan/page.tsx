@@ -156,17 +156,17 @@ export default function KegiatanPage() {
             </Badge>
           </div>
 
-          <h1 className="text-5xl lg:text-7xl font-black text-center mb-6">
+          <h1 className="text-hero font-black text-center mb-6">
             <span className="bg-gradient-to-r from-emerald-700 via-teal-700 to-green-700 bg-clip-text text-transparent">
               Bangun Desa Bersama,
             </span>
             <br />
             <span className="bg-gradient-to-r from-teal-700 via-emerald-700 to-green-700 bg-clip-text text-transparent">
-              Transparan & Terpercaya
+              Transparan &amp; Terpercaya
             </span>
           </h1>
 
-          <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-10 leading-relaxed">
+          <p className="text-subtitle text-gray-600 text-center max-w-3xl mx-auto mb-10">
             Sistem informasi terintegrasi untuk memudahkan partisipasi warga
             dalam kegiatan desa. Donasi online, edukasi hukum AI, dan smart
             farming dalam satu platform.
@@ -223,10 +223,10 @@ export default function KegiatanPage() {
       <section className="py-16 bg-white/50 backdrop-blur-sm relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl lg:text-5xl font-black mb-4 bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
+            <h2 className="text-display font-black mb-4 bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
               Kegiatan Desa Aktif
             </h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            <p className="text-subtitle text-gray-600 max-w-2xl mx-auto">
               Dukung berbagai program pembangunan dan kegiatan desa dengan
               donasi yang transparan dan terverifikasi
             </p>
@@ -383,10 +383,10 @@ export default function KegiatanPage() {
       <section className="py-16 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-black mb-4 bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
+            <h2 className="text-display font-black mb-4 bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
               Fitur Unggulan Kami
             </h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            <p className="text-subtitle text-gray-600 max-w-2xl mx-auto">
               Teknologi modern untuk memberdayakan desa dan meningkatkan
               partisipasi warga
             </p>
@@ -428,10 +428,10 @@ export default function KegiatanPage() {
         </div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h2 className="text-4xl lg:text-5xl font-black text-white mb-6">
+          <h2 className="text-display font-black text-white mb-6">
             Siap Bergabung dengan Desa Cerdas?
           </h2>
-          <p className="text-xl text-emerald-50 mb-10 max-w-2xl mx-auto">
+          <p className="text-subtitle text-emerald-50 mb-10 max-w-2xl mx-auto">
             Mulai kontribusi Anda untuk membangun desa yang lebih maju,
             transparan, dan sejahtera
           </p>

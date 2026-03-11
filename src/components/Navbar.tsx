@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Home, User, LogOut, LayoutDashboard } from "lucide-react";
+import { Home, User, LogOut, LayoutDashboard, Menu, X } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,8 +21,10 @@ interface NavbarProps {
 
 export default function Navbar({ currentPage = "kegiatan" }: NavbarProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const authenticated = authService.isAuthenticated();
@@ -31,8 +33,14 @@ export default function Navbar({ currentPage = "kegiatan" }: NavbarProps) {
     setUser(storedUser);
   }, []);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
   const handleLogout = () => {
     authService.logout();
+    setMobileOpen(false);
   };
 
   const getDashboardUrl = () => {
@@ -40,6 +48,13 @@ export default function Navbar({ currentPage = "kegiatan" }: NavbarProps) {
   };
 
   const isCurrentPage = (page: string) => page === currentPage;
+
+  const navLinks = [
+    { href: "/kegiatan", label: "Kegiatan", page: "kegiatan" },
+    { href: "/smartfarm", label: "Smart Farm", page: "smartfarm" },
+    { href: "/tanya-hukum", label: "Tanya Hukum", page: "tanya-hukum" },
+    { href: "/tentang", label: "Tentang", page: "tentang" },
+  ];
 
   return (
     <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-emerald-100 shadow-sm animate-fade-in-down">
@@ -58,46 +73,22 @@ export default function Navbar({ currentPage = "kegiatan" }: NavbarProps) {
             </span>
           </Link>
 
-          {/* Navigation Links */}
+          {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-8">
-            <Link
-              href="/kegiatan"
-              className={`${isCurrentPage("kegiatan") ? "text-emerald-700 font-bold" : "text-gray-700 hover:text-emerald-600 font-semibold"} transition-colors duration-200 relative group`}
-            >
-              Kegiatan
-              <span
-                className={`absolute -bottom-1 left-0 ${isCurrentPage("kegiatan") ? "w-full" : "w-0"} h-0.5 bg-emerald-600 transition-all duration-300 group-hover:w-full`}
-              ></span>
-            </Link>
-            <Link
-              href="/smartfarm"
-              className={`${isCurrentPage("smartfarm") ? "text-emerald-700 font-bold" : "text-gray-700 hover:text-emerald-600 font-semibold"} transition-colors duration-200 relative group`}
-            >
-              Smart Farm
-              <span
-                className={`absolute -bottom-1 left-0 ${isCurrentPage("smartfarm") ? "w-full" : "w-0"} h-0.5 bg-emerald-600 transition-all duration-300 group-hover:w-full`}
-              ></span>
-            </Link>
-            <Link
-              href="/tanya-hukum"
-              className={`${isCurrentPage("tanya-hukum") ? "text-emerald-700 font-bold" : "text-gray-700 hover:text-emerald-600 font-semibold"} transition-colors duration-200 relative group`}
-            >
-              Tanya Hukum
-              <span
-                className={`absolute -bottom-1 left-0 ${isCurrentPage("tanya-hukum") ? "w-full" : "w-0"} h-0.5 bg-emerald-600 transition-all duration-300 group-hover:w-full`}
-              ></span>
-            </Link>
-            <Link
-              href="/tentang"
-              className={`${isCurrentPage("tentang") ? "text-emerald-700 font-bold" : "text-gray-700 hover:text-emerald-600 font-semibold"} transition-colors duration-200 relative group`}
-            >
-              Tentang
-              <span
-                className={`absolute -bottom-1 left-0 ${isCurrentPage("tentang") ? "w-full" : "w-0"} h-0.5 bg-emerald-600 transition-all duration-300 group-hover:w-full`}
-              ></span>
-            </Link>
+            {navLinks.map((link) => (
+              <Link
+                key={link.page}
+                href={link.href}
+                className={`${isCurrentPage(link.page) ? "text-emerald-700 font-bold" : "text-gray-700 hover:text-emerald-600 font-semibold"} transition-colors duration-200 relative group`}
+              >
+                {link.label}
+                <span
+                  className={`absolute -bottom-1 left-0 ${isCurrentPage(link.page) ? "w-full" : "w-0"} h-0.5 bg-emerald-600 transition-all duration-300 group-hover:w-full`}
+                ></span>
+              </Link>
+            ))}
 
-            {/* Auth Section */}
+            {/* Desktop Auth Section */}
             {isAuthenticated && user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -113,27 +104,17 @@ export default function Navbar({ currentPage = "kegiatan" }: NavbarProps) {
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-semibold leading-none">
-                        {user.nama}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user.email}
-                      </p>
+                      <p className="text-sm font-semibold leading-none">{user.nama}</p>
+                      <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => router.push(getDashboardUrl())}
-                    className="cursor-pointer"
-                  >
+                  <DropdownMenuItem onClick={() => router.push(getDashboardUrl())} className="cursor-pointer">
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     <span>Dashboard</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={handleLogout}
-                    className="cursor-pointer text-red-600"
-                  >
+                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Keluar</span>
                   </DropdownMenuItem>
@@ -142,6 +123,74 @@ export default function Navbar({ currentPage = "kegiatan" }: NavbarProps) {
             ) : (
               <Link href="/login">
                 <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 cursor-pointer">
+                  Masuk
+                </Button>
+              </Link>
+            )}
+          </div>
+
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden p-2 rounded-xl border-2 border-emerald-100 hover:bg-emerald-50 text-gray-700 transition-all duration-200"
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Drawer */}
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"}`}
+      >
+        <div className="bg-white/95 backdrop-blur-xl border-t border-emerald-100 px-4 py-4 space-y-1 shadow-lg">
+          {navLinks.map((link) => (
+            <Link
+              key={link.page}
+              href={link.href}
+              onClick={() => setMobileOpen(false)}
+              className={`flex items-center px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
+                isCurrentPage(link.page)
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                  : "text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+
+          {/* Mobile Auth */}
+          <div className="pt-2 border-t border-emerald-100">
+            {isAuthenticated && user ? (
+              <div className="space-y-1">
+                <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 rounded-xl">
+                  <div className="w-9 h-9 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                    <User className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-gray-900 truncate">{user.nama}</p>
+                    <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => { router.push(getDashboardUrl()); setMobileOpen(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 font-semibold hover:bg-emerald-50 hover:text-emerald-700 transition-all"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  Dashboard
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 font-semibold hover:bg-red-50 transition-all"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Keluar
+                </button>
+              </div>
+            ) : (
+              <Link href="/login" onClick={() => setMobileOpen(false)}>
+                <Button className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg transition-all duration-200">
                   Masuk
                 </Button>
               </Link>

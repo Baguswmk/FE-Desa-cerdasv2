@@ -100,11 +100,11 @@ export default function TentangPage() {
             <Home className="w-10 h-10 text-white" />
           </div>
 
-          <h1 className="text-5xl lg:text-6xl font-black text-white mb-6 animate-fade-in-up animation-delay-200">
+          <h1 className="text-hero font-black text-white mb-6 animate-fade-in-up animation-delay-200">
             Tentang Desa Cerdas
           </h1>
 
-          <p className="text-xl text-emerald-50 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-300">
+          <p className="text-subtitle text-emerald-50 max-w-3xl mx-auto animate-fade-in-up animation-delay-300">
             Platform digital terintegrasi yang menghubungkan pemerintah desa
             dengan warga, menciptakan transparansi, partisipasi, dan pembangunan
             berkelanjutan untuk desa yang lebih maju.
@@ -167,7 +167,7 @@ export default function TentangPage() {
 
         {/* Statistics */}
         <div className="mb-16 animate-fade-in-up animation-delay-400">
-          <h2 className="text-3xl font-black text-center bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent mb-8">
+          <h2 className="text-display font-black text-center bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent mb-8">
             Dampak Kami
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -195,7 +195,7 @@ export default function TentangPage() {
 
         {/* Features */}
         <div className="mb-16 animate-fade-in-up animation-delay-500">
-          <h2 className="text-3xl font-black text-center bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent mb-8">
+          <h2 className="text-display font-black text-center bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent mb-8">
             Fitur Unggulan
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -229,8 +229,8 @@ export default function TentangPage() {
 
         {/* Team */}
         <div className="mb-16 animate-fade-in-up animation-delay-600">
-          <h2 className="text-3xl font-black text-center bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent mb-8">
-            Tim & Kolaborasi
+          <h2 className="text-display font-black text-center bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent mb-8">
+            Tim &amp; Kolaborasi
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             {team.map((member, index) => (

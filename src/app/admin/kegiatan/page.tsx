@@ -44,6 +44,7 @@ import {
 } from "lucide-react";
 import { authService } from "@/services/auth.service";
 import { kegiatanService } from "@/services/kegiatan.service";
+import AdminNavbar from "@/components/AdminNavbar";
 
 // ─── Banner size guide ─────────────────────────────────────────────────────
 const BANNER_SPEC = {
@@ -400,53 +401,7 @@ export default function AdminKegiatanPage() {
       )}
 
       {/* Navbar */}
-      <nav className="relative z-10 bg-white/80 backdrop-blur-md shadow-lg border-b-2 border-emerald-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <ClipboardList className="w-6 h-6 text-white" />
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-amber-400 rounded-full border-2 border-white"></div>
-              </div>
-              <div>
-                <span className="text-xl font-black bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
-                  Kelola Kegiatan
-                </span>
-                <p className="text-xs text-gray-500 font-medium">Admin Panel</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Link href="/admin/donasi">
-                <Button
-                  variant="ghost"
-                  className="font-semibold text-gray-700 hover:text-emerald-700 hover:bg-emerald-50"
-                >
-                  <Heart className="w-4 h-4 mr-2" />
-                  Donasi
-                </Button>
-              </Link>
-              <Link href="/admin/dashboard">
-                <Button
-                  variant="ghost"
-                  className="font-semibold text-gray-700 hover:text-emerald-700 hover:bg-emerald-50"
-                >
-                  <Home className="w-4 h-4 mr-2" />
-                  Dashboard
-                </Button>
-              </Link>
-              <Button
-                onClick={() => authService.logout()}
-                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Keluar
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <AdminNavbar />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
