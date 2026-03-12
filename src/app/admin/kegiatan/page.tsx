@@ -386,12 +386,13 @@ export default function AdminKegiatanPage() {
   const paginatedKegiatan = filteredKegiatan.slice((kPage - 1) * K_PER_PAGE, kPage * K_PER_PAGE);
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-emerald-50/30 dark:from-gray-900 dark:to-emerald-950/20 relative overflow-hidden transition-colors duration-300">
       {/* Background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-200/20 dark:bg-emerald-900/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-200/20 dark:bg-teal-900/20 rounded-full blur-3xl animate-pulse [animation-delay:1000ms]"></div>
       </div>
+
 
       {/* Toast */}
       {toast && (
@@ -413,7 +414,6 @@ export default function AdminKegiatanPage() {
 
       {/* Navbar */}
       <AdminNavbar />
-
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
