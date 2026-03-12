@@ -47,6 +47,7 @@ import {
 import { authService } from "@/services/auth.service";
 import { kegiatanService } from "@/services/kegiatan.service";
 import AdminNavbar from "@/components/AdminNavbar";
+import ConfirmModal from "@/components/ConfirmModal";
 
 // ─── Banner size guide ─────────────────────────────────────────────────────
 const BANNER_SPEC = {
@@ -71,9 +72,20 @@ export default function AdminKegiatanPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [deleteModal, setDeleteModal] = useState<{ id: string; title: string } | null>(null);
+  const [confirmModalConfig, setConfirmModalConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: "",
+    description: "",
+    onConfirm: () => {},
+  });
   const [deleting, setDeleting] = useState(false);
   const [kPage, setKPage] = useState(1);
-  const K_PER_PAGE = 8;
+  const [kPerPage, setKPerPage] = useState<number | "ALL">(8);
 
   // form
   const [formData, setFormData] = useState({
@@ -297,17 +309,24 @@ export default function AdminKegiatanPage() {
     }
   };
 
-  const handleDeleteExistingPhoto = async (photoName: string) => {
+  const handleDeleteExistingPhoto = (photoName: string) => {
     if (!editingId) return;
-    if (!confirm("Hapus foto yang sudah ada dari server? Tindakan ini tidak bisa dibatalkan.")) return;
-    try {
-      await kegiatanService.deletePhoto(editingId, photoName);
-      setExistingPhotos((prev) => prev.filter((p) => p !== photoName));
-      showToast("success", "Foto berhasil dihapus.");
-      loadKegiatan();
-    } catch (error: any) {
-      showToast("error", error.response?.data?.message || "Gagal menghapus foto");
-    }
+    setConfirmModalConfig({
+      isOpen: true,
+      title: "Hapus Foto",
+      description: "Hapus foto yang sudah ada dari server? Tindakan ini tidak bisa dibatalkan.",
+      onConfirm: async () => {
+        try {
+          setConfirmModalConfig((prev) => ({ ...prev, isOpen: false }));
+          await kegiatanService.deletePhoto(editingId, photoName);
+          setExistingPhotos((prev) => prev.filter((p) => p !== photoName));
+          showToast("success", "Foto berhasil dihapus.");
+          loadKegiatan();
+        } catch (error: any) {
+          showToast("error", error.response?.data?.message || "Gagal menghapus foto");
+        }
+      },
+    });
   };
 
   // ── Add photos to existing kegiatan ────────────────────────────────────
@@ -342,18 +361,25 @@ export default function AdminKegiatanPage() {
     }
   };
 
-  const handleDeletePhoto = async (kegiatanId: string, photoName: string) => {
-    if (!confirm("Hapus foto ini?")) return;
-    try {
-      await kegiatanService.deletePhoto(kegiatanId, photoName);
-      showToast("success", "Foto berhasil dihapus.");
-      loadKegiatan();
-    } catch (error: any) {
-      showToast(
-        "error",
-        error.response?.data?.message || "Gagal menghapus foto",
-      );
-    }
+  const handleDeletePhoto = (kegiatanId: string, photoName: string) => {
+    setConfirmModalConfig({
+      isOpen: true,
+      title: "Hapus Foto",
+      description: "Hapus foto ini?",
+      onConfirm: async () => {
+        try {
+          setConfirmModalConfig((prev) => ({ ...prev, isOpen: false }));
+          await kegiatanService.deletePhoto(kegiatanId, photoName);
+          showToast("success", "Foto berhasil dihapus.");
+          loadKegiatan();
+        } catch (error: any) {
+          showToast(
+            "error",
+            error.response?.data?.message || "Gagal menghapus foto",
+          );
+        }
+      },
+    });
   };
 
   const formatCurrency = (amount: number) =>
@@ -382,6 +408,7 @@ export default function AdminKegiatanPage() {
   const filteredKegiatan = kegiatan.filter((item: any) =>
     item.title?.toLowerCase().includes(search.toLowerCase())
   );
+  const K_PER_PAGE = kPerPage === "ALL" ? filteredKegiatan.length || 1 : kPerPage;
   const totalPagesKegiatan = Math.ceil(filteredKegiatan.length / K_PER_PAGE);
   const paginatedKegiatan = filteredKegiatan.slice((kPage - 1) * K_PER_PAGE, kPage * K_PER_PAGE);
 
@@ -411,6 +438,14 @@ export default function AdminKegiatanPage() {
           <span className="font-semibold text-sm">{toast.msg}</span>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={confirmModalConfig.isOpen}
+        onClose={() => setConfirmModalConfig((prev) => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmModalConfig.onConfirm}
+        title={confirmModalConfig.title}
+        description={confirmModalConfig.description}
+      />
 
       {/* Navbar */}
       <AdminNavbar />
@@ -1094,6 +1129,7 @@ export default function AdminKegiatanPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-gray-50/80 dark:bg-gray-800/80 border-b-2 border-gray-100 dark:border-gray-800">
+                    <th className="text-left px-5 py-3.5 font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs">No</th>
                     <th className="text-left px-5 py-3.5 font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs">Kegiatan</th>
                     <th className="text-center px-4 py-3.5 font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs">Status</th>
                     <th className="text-left px-4 py-3.5 font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs">Periode</th>
@@ -1103,7 +1139,7 @@ export default function AdminKegiatanPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                  {paginatedKegiatan.map((item: any) => {
+                  {paginatedKegiatan.map((item: any, index: number) => {
                       const progress = Math.min(
                         ((item.current_amount ?? 0) / (item.target_amount ?? 1)) * 100,
                         100,
@@ -1115,6 +1151,11 @@ export default function AdminKegiatanPage() {
                       };
                       return (
                         <tr key={item.id} className="hover:bg-emerald-50/30 dark:hover:bg-gray-700/50 transition-colors">
+                          <td className="px-5 py-4">
+                            <p className="font-semibold text-gray-800 dark:text-gray-200 max-w-[180px] truncate">
+                              {(kPage - 1) * K_PER_PAGE + index + 1}
+                            </p>
+                          </td>
                           {/* Kegiatan */}
                           <td className="px-5 py-4">
                             <div className="flex items-center gap-3">
@@ -1224,39 +1265,82 @@ export default function AdminKegiatanPage() {
             </div>
 
             {/* Pagination kegiatan */}
-            {totalPagesKegiatan > 1 && (
-              <div className="border-t-2 border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 px-5 py-3 flex items-center justify-between">
-                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-                  <span className="text-gray-800 dark:text-gray-200">{(kPage - 1) * K_PER_PAGE + 1}</span>
-                  {" – "}
-                  <span className="text-gray-800 dark:text-gray-200">{Math.min(kPage * K_PER_PAGE, filteredKegiatan.length)}</span>
-                  {" dari "}
-                  <span className="text-gray-800 dark:text-gray-200">{filteredKegiatan.length}</span>
-                  {" kegiatan"}
-                </p>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline" size="sm"
-                    onClick={() => setKPage(p => Math.max(1, p - 1))}
-                    disabled={kPage === 1}
-                    className="border-2 font-bold h-8 w-8 p-0 dark:border-gray-700 dark:hover:bg-gray-800"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </Button>
-                  <span className="text-sm font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg w-8 h-8 flex items-center justify-center">
-                    {kPage}
-                  </span>
-                  <Button
-                    variant="outline" size="sm"
-                    onClick={() => setKPage(p => Math.min(totalPagesKegiatan, p + 1))}
-                    disabled={kPage === totalPagesKegiatan}
-                    className="border-2 font-bold h-8 w-8 p-0 dark:border-gray-700 dark:hover:bg-gray-800"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
+            {(() => {
+              const totalPagesKegiatan = Math.ceil(filteredKegiatan.length / K_PER_PAGE);
+              if (filteredKegiatan.length === 0) return null;
+              return (
+                <div className="border-t-2 border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 px-5 py-3 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">Tampilkan:</span>
+                      <select
+                        value={kPerPage}
+                        onChange={(e) => {
+                          setKPerPage(e.target.value === "ALL" ? "ALL" : Number(e.target.value));
+                          setKPage(1);
+                        }}
+                        className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm font-semibold py-1 px-2 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 dark:text-gray-200 transition-all cursor-pointer shadow-sm"
+                      >
+                        <option value={8}>8</option>
+                        <option value={16}>16</option>
+                        <option value={32}>32</option>
+                        <option value={64}>64</option>
+                        <option value="ALL">Semua</option>
+                      </select>
+                    </div>
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                      <span className="text-gray-800 dark:text-gray-200">{(kPage - 1) * K_PER_PAGE + 1}</span>
+                      {" – "}
+                      <span className="text-gray-800 dark:text-gray-200">{Math.min(kPage * K_PER_PAGE, filteredKegiatan.length)}</span>
+                      {" dari "}
+                      <span className="text-gray-800 dark:text-gray-200">{filteredKegiatan.length}</span>
+                      {" kegiatan"}
+                    </p>
+                  </div>
+                  
+                  {totalPagesKegiatan > 1 && (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline" size="sm"
+                        onClick={() => setKPage(p => Math.max(1, p - 1))}
+                        disabled={kPage === 1}
+                        className="border-2 font-bold h-8 w-8 p-0 dark:border-gray-700 dark:hover:bg-gray-800"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </Button>
+                      
+                      {Array.from({ length: totalPagesKegiatan }, (_, i) => i + 1)
+                        .filter(p => totalPagesKegiatan <= 5 || p === 1 || p === totalPagesKegiatan || Math.abs(p - kPage) <= 1)
+                        .map((p, i, arr) => (
+                          <div key={p} className="flex gap-1 items-center">
+                            {i > 0 && p - arr[i - 1] > 1 && <span className="text-gray-400 dark:text-gray-500 font-bold px-1">...</span>}
+                            <Button 
+                              variant={kPage === p ? 'default' : 'outline'} 
+                              size="sm"
+                              onClick={() => setKPage(p)}
+                              className={kPage === p 
+                                ? "bg-emerald-600 hover:bg-emerald-700 text-white font-black dark:bg-emerald-600 dark:hover:bg-emerald-700 border-none shadow-md h-8 w-8 p-0" 
+                                : "border-2 font-bold text-gray-600 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-800 h-8 w-8 p-0"}
+                            >
+                              {p}
+                            </Button>
+                          </div>
+                        ))
+                      }
+
+                      <Button
+                        variant="outline" size="sm"
+                        onClick={() => setKPage(p => Math.min(totalPagesKegiatan, p + 1))}
+                        disabled={kPage === totalPagesKegiatan}
+                        className="border-2 font-bold h-8 w-8 p-0 dark:border-gray-700 dark:hover:bg-gray-800"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              );
+            })()}
             </Card>
         )}
       </div>

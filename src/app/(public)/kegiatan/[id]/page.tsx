@@ -156,14 +156,15 @@ export default function KegiatanDetailPage() {
   const handleSubmitDonation = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFile) { alert("Silakan pilih bukti transfer"); return; }
-    if (!donationForm.amount || Number(donationForm.amount) < 10000) {
+    const rawAmount = Number(donationForm.amount.replace(/\D/g, ""));
+    if (!rawAmount || rawAmount < 10000) {
       alert("Minimal donasi Rp 10.000"); return;
     }
     setSubmitting(true);
     try {
       await donasiService.createDonation({
         kegiatan_id: params.id as string,
-        amount: Number(donationForm.amount),
+        amount: rawAmount,
         donor_name: donationForm.donor_name || "Anonim",
         message: donationForm.message || undefined,
         bukti_transfer: selectedFile,
@@ -177,6 +178,16 @@ export default function KegiatanDetailPage() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\D/g, "");
+    if (!rawValue) {
+      setDonationForm({ ...donationForm, amount: "" });
+      return;
+    }
+    const formatted = new Intl.NumberFormat("id-ID").format(Number(rawValue));
+    setDonationForm({ ...donationForm, amount: formatted });
   };
 
   const formatCurrency = (amount: number) =>
@@ -375,13 +386,19 @@ export default function KegiatanDetailPage() {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
         <div className="absolute bottom-6 left-6 pointer-events-none">
-          <Badge className="bg-emerald-600/90 text-white backdrop-blur-sm border border-white/20 shadow-lg">
-            <span className="relative flex h-2 w-2 mr-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-            </span>
-            Program Aktif
-          </Badge>
+          {kegiatan.status === "ACTIVE" ? (
+            <Badge className="bg-emerald-600/90 text-white backdrop-blur-sm border border-white/20 shadow-lg">
+              <span className="relative flex h-2 w-2 mr-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+              </span>
+              Program Aktif
+            </Badge>
+          ) : (
+            <Badge className="bg-gray-600/90 text-white backdrop-blur-sm border border-white/20 shadow-lg pr-4">
+              Program Selesai / Ditutup
+            </Badge>
+          )}
         </div>
       </div>
 
@@ -829,123 +846,139 @@ export default function KegiatanDetailPage() {
             <Card className="border-2 border-emerald-100 dark:border-emerald-900 shadow-xl sticky top-24 bg-white dark:bg-gray-800 transition-colors duration-300">
               <CardHeader>
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500 rounded-xl flex items-center justify-center">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${kegiatan.status === "ACTIVE" ? 'bg-gradient-to-br from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500' : 'bg-gray-400 dark:bg-gray-600'}`}>
                     <Heart className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-xl font-black text-gray-900 dark:text-gray-100">Kirim Donasi</CardTitle>
-                    <CardDescription className="text-xs dark:text-gray-400">Bantu wujudkan program ini</CardDescription>
+                    <CardTitle className="text-xl font-black text-gray-900 dark:text-gray-100">
+                      {kegiatan.status === "ACTIVE" ? "Kirim Donasi" : "Program Ditutup"}
+                    </CardTitle>
+                    <CardDescription className="text-xs dark:text-gray-400">
+                      {kegiatan.status === "ACTIVE" ? "Bantu wujudkan program ini" : "Terima kasih atas partisipasi Anda"}
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
 
               <CardContent>
-                {success && (
-                  <Alert className="mb-6 border-2 border-green-200 bg-green-50 dark:border-green-800/50 dark:bg-green-900/30">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-                    <AlertDescription className="text-green-800 dark:text-green-300 font-semibold">
-                      Donasi berhasil dikirim! Terima kasih atas kontribusi Anda.
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <form onSubmit={handleSubmitDonation} className="space-y-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="amount" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      Jumlah Donasi <span className="text-red-500">*</span>
-                    </Label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 font-semibold">Rp</span>
-                      <Input
-                        id="amount" type="number" required min={10000}
-                        value={donationForm.amount}
-                        onChange={(e) => setDonationForm({ ...donationForm, amount: e.target.value })}
-                        placeholder="10.000"
-                        className="pl-10 h-11 border-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500"
-                        disabled={submitting}
-                      />
-                    </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Minimal donasi Rp 10.000</p>
+                {kegiatan.status !== "ACTIVE" ? (
+                  <div className="text-center py-6">
+                    <Alert className="border-2 border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
+                      <AlertDescription className="text-gray-600 dark:text-gray-300 font-medium">
+                        Penggalangan dana untuk kegiatan ini telah berakhir atau ditutup. Terima kasih atas dukungan dan partisipasi dari seluruh donatur.
+                      </AlertDescription>
+                    </Alert>
                   </div>
+                ) : (
+                  <>
+                    {success && (
+                      <Alert className="mb-6 border-2 border-green-200 bg-green-50 dark:border-green-800/50 dark:bg-green-900/30">
+                        <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+                        <AlertDescription className="text-green-800 dark:text-green-300 font-semibold">
+                          Donasi berhasil dikirim! Terima kasih atas kontribusi Anda.
+                        </AlertDescription>
+                      </Alert>
+                    )}
 
-                  <div className="space-y-2">
-                    <Label htmlFor="donor_name" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      Nama Donatur
-                      <Badge variant="secondary" className="ml-2 text-xs dark:bg-gray-700 dark:text-gray-300">Opsional</Badge>
-                    </Label>
-                    <Input
-                      id="donor_name" type="text"
-                      value={donationForm.donor_name}
-                      onChange={(e) => setDonationForm({ ...donationForm, donor_name: e.target.value })}
-                      placeholder="Nama Anda (opsional)"
-                      className="h-11 border-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500"
-                      disabled={submitting}
-                    />
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Kosongkan untuk donasi anonim</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="message" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      Pesan / Doa
-                      <Badge variant="secondary" className="ml-2 text-xs dark:bg-gray-700 dark:text-gray-300">Opsional</Badge>
-                    </Label>
-                    <Textarea
-                      id="message"
-                      value={donationForm.message}
-                      onChange={(e) => setDonationForm({ ...donationForm, message: e.target.value })}
-                      placeholder="Semoga bermanfaat untuk warga desa..."
-                      className="border-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500 resize-none"
-                      rows={2}
-                      maxLength={500}
-                      disabled={submitting}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="bukti" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      Bukti Transfer <span className="text-red-500">*</span>
-                    </Label>
-                    <label
-                      htmlFor="bukti"
-                      className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
-                        selectedFile ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20" : "border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10"
-                      }`}
-                    >
-                      <div className="flex flex-col items-center justify-center py-4">
-                        {selectedFile ? (
-                          <>
-                            <FileImage className="w-10 h-10 text-emerald-600 dark:text-emerald-400 mb-2" />
-                            <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">{selectedFile.name}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Klik untuk mengganti file</p>
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="w-10 h-10 text-gray-400 dark:text-gray-500 mb-2" />
-                            <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Upload bukti transfer</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">PNG, JPG, PDF (Max 5MB)</p>
-                          </>
-                        )}
+                    <form onSubmit={handleSubmitDonation} className="space-y-5">
+                      <div className="space-y-2">
+                        <Label htmlFor="amount" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                          Jumlah Donasi <span className="text-red-500">*</span>
+                        </Label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 font-semibold">Rp</span>
+                          <Input
+                            id="amount" type="text" inputMode="numeric" required
+                            value={donationForm.amount}
+                            onChange={handleAmountChange}
+                            placeholder="10.000"
+                            className="pl-10 h-11 border-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500"
+                            disabled={submitting}
+                          />
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Minimal donasi Rp 10.000</p>
                       </div>
-                      <input id="bukti" type="file" className="hidden" accept="image/*,application/pdf" onChange={handleFileChange} disabled={submitting} />
-                    </label>
-                  </div>
 
-                  <Button
-                    type="submit" disabled={submitting}
-                    className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 dark:from-emerald-500 dark:to-teal-500 text-white font-bold text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
-                  >
-                    {submitting ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Mengirim Donasi...</> : <><Heart className="mr-2 h-5 w-5" />Kirim Donasi Sekarang</>}
-                  </Button>
+                      <div className="space-y-2">
+                        <Label htmlFor="donor_name" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                          Nama Donatur
+                          <Badge variant="secondary" className="ml-2 text-xs dark:bg-gray-700 dark:text-gray-300">Opsional</Badge>
+                        </Label>
+                        <Input
+                          id="donor_name" type="text"
+                          value={donationForm.donor_name}
+                          onChange={(e) => setDonationForm({ ...donationForm, donor_name: e.target.value })}
+                          placeholder="Nama Anda (opsional)"
+                          className="h-11 border-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500"
+                          disabled={submitting}
+                        />
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Kosongkan untuk donasi anonim</p>
+                      </div>
 
-                  <div className="pt-4 border-t border-emerald-100 dark:border-gray-700">
-                    <div className="flex items-start gap-2">
-                      <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-500 flex-shrink-0 mt-0.5" />
-                      <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                        Donasi Anda akan diverifikasi oleh admin desa. Bukti transfer akan disimpan dengan aman untuk transparansi.
-                      </p>
-                    </div>
-                  </div>
-                </form>
+                      <div className="space-y-2">
+                        <Label htmlFor="message" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                          Pesan / Doa
+                          <Badge variant="secondary" className="ml-2 text-xs dark:bg-gray-700 dark:text-gray-300">Opsional</Badge>
+                        </Label>
+                        <Textarea
+                          id="message"
+                          value={donationForm.message}
+                          onChange={(e) => setDonationForm({ ...donationForm, message: e.target.value })}
+                          placeholder="Semoga bermanfaat untuk warga desa..."
+                          className="border-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500 resize-none"
+                          rows={2}
+                          maxLength={500}
+                          disabled={submitting}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="bukti" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                          Bukti Transfer <span className="text-red-500">*</span>
+                        </Label>
+                        <label
+                          htmlFor="bukti"
+                          className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
+                            selectedFile ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20" : "border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10"
+                          }`}
+                        >
+                          <div className="flex flex-col items-center justify-center py-4">
+                            {selectedFile ? (
+                              <>
+                                <FileImage className="w-10 h-10 text-emerald-600 dark:text-emerald-400 mb-2" />
+                                <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">{selectedFile.name}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Klik untuk mengganti file</p>
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="w-10 h-10 text-gray-400 dark:text-gray-500 mb-2" />
+                                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Upload bukti transfer</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">PNG, JPG, PDF (Max 5MB)</p>
+                              </>
+                            )}
+                          </div>
+                          <input id="bukti" type="file" className="hidden" accept="image/*,application/pdf" onChange={handleFileChange} disabled={submitting} />
+                        </label>
+                      </div>
+
+                      <Button
+                        type="submit" disabled={submitting}
+                        className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 dark:from-emerald-500 dark:to-teal-500 text-white font-bold text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
+                      >
+                        {submitting ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Mengirim Donasi...</> : <><Heart className="mr-2 h-5 w-5" />Kirim Donasi Sekarang</>}
+                      </Button>
+
+                      <div className="pt-4 border-t border-emerald-100 dark:border-gray-700">
+                        <div className="flex items-start gap-2">
+                          <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-500 flex-shrink-0 mt-0.5" />
+                          <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                            Donasi Anda akan diverifikasi oleh admin desa. Bukti transfer akan disimpan dengan aman untuk transparansi.
+                          </p>
+                        </div>
+                      </div>
+                    </form>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>

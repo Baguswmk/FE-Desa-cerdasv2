@@ -66,7 +66,7 @@ export default function DonasiPage() {
   // Search & Pagination States
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 6;
+  const [itemsPerPage, setItemsPerPage] = useState<number | "ALL">(10);
 
   const loadData = async () => {
     setLoading(true);
@@ -117,6 +117,7 @@ export default function DonasiPage() {
     activity.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const ITEMS_PER_PAGE = itemsPerPage === "ALL" ? filteredActivities.length || 1 : itemsPerPage;
   const totalPages = Math.ceil(filteredActivities.length / ITEMS_PER_PAGE);
   const paginatedActivities = filteredActivities.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -214,9 +215,8 @@ export default function DonasiPage() {
             {paginatedActivities.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {paginatedActivities.map((activity) => (
-                 <Link href={`/kegiatan/${activity.id}`}>
+                 <Link key={activity.id} href={`/kegiatan/${activity.id}`}>
                   <Card
-                    key={activity.id}
                   className="group overflow-hidden border-2 border-emerald-100 dark:border-emerald-900 hover:border-emerald-300 dark:hover:border-emerald-600 hover:shadow-2xl dark:hover:shadow-emerald-900/20 transition-all duration-500 transform hover:-translate-y-2 bg-white dark:bg-gray-800"
                 >
                   {/* Image */}
@@ -286,12 +286,13 @@ export default function DonasiPage() {
                         year: "numeric",
                       })}
                     </div>
-                    <Link href={`/kegiatan/${activity.id}`}>
-                      <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 dark:from-emerald-700 dark:to-teal-700 dark:hover:from-emerald-600 dark:hover:to-teal-600 text-white font-bold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all cursor-pointer">
-                        <Heart className="w-4 h-4 mr-1.5" />
-                        Donasi
-                      </Button>
-                    </Link>
+                    <Button
+                      onClick={(e) => e.preventDefault()}
+                      className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 dark:from-emerald-700 dark:to-teal-700 dark:hover:from-emerald-600 dark:hover:to-teal-600 text-white font-bold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all cursor-pointer"
+                    >
+                      <Heart className="w-4 h-4 mr-1.5" />
+                      Donasi
+                    </Button>
                   </CardFooter>
                 </Card>
               </Link>))}
@@ -307,44 +308,73 @@ export default function DonasiPage() {
             )}
 
             {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-12">
-                <Button
-                  variant="outline"
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="rounded-xl border-2 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300 w-10 h-10 p-0"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </Button>
-                
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "outline"}
-                      onClick={() => setCurrentPage(page)}
-                      className={`w-10 h-10 p-0 rounded-xl font-bold transition-all ${
-                        currentPage === page 
-                          ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md border-transparent" 
-                          : "border-2 hover:border-emerald-300 hover:text-emerald-700 dark:border-gray-700 dark:hover:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
-                      }`}
+            {(() => {
+              if (filteredActivities.length === 0) return null;
+              return (
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-12 px-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Tampilkan:</span>
+                    <select
+                      value={itemsPerPage}
+                      onChange={(e) => {
+                        setItemsPerPage(e.target.value === "ALL" ? "ALL" : Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      className="bg-white/50 dark:bg-gray-800/50 border-2 border-emerald-100 dark:border-gray-700 text-sm font-bold text-emerald-800 dark:text-emerald-400 rounded-xl px-3 py-1.5 outline-none focus:border-emerald-500 transition-all cursor-pointer backdrop-blur-sm"
                     >
-                      {page}
-                    </Button>
-                  ))}
-                </div>
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value="ALL">Semua</option>
+                    </select>
+                  </div>
 
-                <Button
-                  variant="outline"
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="rounded-xl border-2 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300 w-10 h-10 p-0"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </Button>
-              </div>
-            )}
+                  {totalPages > 1 && (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className="rounded-xl border-2 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300 w-10 h-10 p-0"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </Button>
+                      
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1)
+                          .filter(p => totalPages <= 5 || p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                          .map((page, i, arr) => (
+                            <div key={page} className="flex gap-1 items-center">
+                              {i > 0 && page - arr[i - 1] > 1 && <span className="text-gray-400 dark:text-gray-500 font-bold px-1">...</span>}
+                              <Button
+                                variant={currentPage === page ? "default" : "outline"}
+                                onClick={() => setCurrentPage(page)}
+                                className={`w-10 h-10 p-0 rounded-xl font-bold transition-all ${
+                                  currentPage === page 
+                                    ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md border-transparent" 
+                                    : "border-2 hover:border-emerald-300 hover:text-emerald-700 dark:border-gray-700 dark:hover:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                                }`}
+                              >
+                                {page}
+                              </Button>
+                            </div>
+                        ))}
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        className="rounded-xl border-2 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300 w-10 h-10 p-0"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
             </>
           )}
         </div>

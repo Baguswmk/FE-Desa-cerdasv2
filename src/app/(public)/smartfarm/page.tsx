@@ -48,6 +48,7 @@ import {
 } from "lucide-react";
 import { smartFarmService } from "@/services/smartfarm.service";
 import { useAuth } from "@/hooks/useAuth";
+import ConfirmModal from "@/components/ConfirmModal";
 
 // ─── BMKG Data Wilayah Pringsewu ──────────────────────────────────────────────
 // Sumber: BMKG Open Data (https://api.bmkg.go.id)
@@ -218,10 +219,13 @@ export default function SmartFarmPage() {
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
   
-  // Chat Room states
   const [sessions, setSessions] = useState<Session[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<{ isOpen: boolean; sessionId: string | null }>({
+    isOpen: false,
+    sessionId: null,
+  });
   
   // Location detection
   const [locationEnabled, setLocationEnabled] = useState(false);
@@ -261,7 +265,7 @@ export default function SmartFarmPage() {
         const grouped: Record<string, Session> = {};
         
         [...history.data].reverse().forEach((msg: any) => {
-          const sid = msg.session_id || "default";
+          const sid = msg.session_id || "null";
           if (!grouped[sid]) {
             grouped[sid] = {
               id: sid,
@@ -392,11 +396,17 @@ export default function SmartFarmPage() {
     if (isSidebarOpen) setIsSidebarOpen(false);
   };
 
-  const handleDeleteSession = async (sessionId: string, e: React.MouseEvent) => {
+  const handleDeleteSessionClick = (sessionId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm("Apakah Anda yakin ingin menghapus obrolan ini?")) return;
+    setConfirmDelete({ isOpen: true, sessionId });
+  };
+
+  const handleConfirmDelete = async () => {
+    const sessionId = confirmDelete.sessionId;
+    if (!sessionId) return;
     
     try {
+      setConfirmDelete({ isOpen: false, sessionId: null });
       await smartFarmService.deleteFarmChatSession(sessionId);
       if (activeSessionId === sessionId) {
         setActiveSessionId(null);
@@ -954,7 +964,7 @@ export default function SmartFarmPage() {
                             </div>
                           </div>
                           <button 
-                            onClick={(e) => handleDeleteSession(session.id, e)}
+                            onClick={(e) => handleDeleteSessionClick(session.id, e)}
                             className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 rounded-md transition-all shrink-0"
                             title="Hapus Obrolan"
                           >
@@ -1005,7 +1015,7 @@ export default function SmartFarmPage() {
                               <span className="truncate text-sm font-medium dark:text-gray-200">{session.title}</span>
                             </div>
                             <button 
-                              onClick={(e) => handleDeleteSession(session.id, e)}
+                              onClick={(e) => handleDeleteSessionClick(session.id, e)}
                               className="p-1.5 text-red-500 rounded-md shrink-0"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -1249,6 +1259,15 @@ export default function SmartFarmPage() {
           </div> */}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmDelete.isOpen}
+        onClose={() => setConfirmDelete({ isOpen: false, sessionId: null })}
+        onConfirm={handleConfirmDelete}
+        title="Hapus Obrolan"
+        description="Apakah Anda yakin ingin menghapus obrolan ini? Tindakan ini tidak dapat dibatalkan."
+      />
+
     </div>
   );
 }

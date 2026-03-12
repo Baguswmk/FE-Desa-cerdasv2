@@ -61,7 +61,8 @@ export default function AdminDonasiPage() {
 
   // Pagination
   const [dPage, setDPage] = useState(1);
-  const D_PER_PAGE = 10;
+  const [dPerPage, setDPerPage] = useState<number | "ALL">(10);
+  const D_PER_PAGE = dPerPage === "ALL" ? donations.length || 1 : dPerPage;
 
   // ── Modal state ──────────────────────────────────────────────────────────────
   const [modal, setModal] = useState<{
@@ -386,7 +387,7 @@ export default function AdminDonasiPage() {
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={closeModal}
           />
-          <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-gray-200 dark:border-gray-700 w-full max-w-lg animate-in zoom-in-95 duration-200">
+          <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-gray-200 dark:border-gray-700 w-full max-w-4xl animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
               <h3 className="font-black text-gray-900 dark:text-gray-100 flex items-center gap-2">
                 <ImageIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -401,25 +402,14 @@ export default function AdminDonasiPage() {
                 <X className="w-4 h-4" />
               </Button>
             </div>
-            <div className="p-4">
+            <div className="p-4 flex justify-center bg-gray-50/50 dark:bg-gray-900/30 overflow-auto">
               {modal.donation.bukti_transfer ? (
-                <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={`${apiBase}/uploads/${modal.donation.bukti_transfer}`}
-                    alt="Bukti Transfer"
-                    className="w-full rounded-xl object-contain max-h-[60vh]"
-                  />
-                  <a
-                    href={`${apiBase}/uploads/${modal.donation.bukti_transfer}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-3 flex items-center justify-center gap-2 text-sm font-semibold text-emerald-700 hover:underline"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Buka di tab baru
-                  </a>
-                </>
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={`${apiBase}/uploads/${modal.donation.bukti_transfer}`}
+                  alt="Bukti Transfer"
+                  className="w-auto h-auto rounded-xl object-contain max-h-[80vh] shadow-sm"
+                />
               ) : (
                 <div className="h-48 flex items-center justify-center text-gray-400 dark:text-gray-500">
                   <AlertCircle className="w-8 h-8 mr-2" /> Tidak ada bukti
@@ -427,7 +417,7 @@ export default function AdminDonasiPage() {
                 </div>
               )}
             </div>
-            <div className="flex gap-3 p-4 pt-0 border-t border-gray-100 dark:border-gray-700">
+            <div className="flex gap-3 p-4 pt-0 border-t border-gray-100 dark:border-gray-700 mt-4">
               <Button
                 onClick={() => {
                   closeModal();
@@ -525,6 +515,9 @@ export default function AdminDonasiPage() {
                   <thead>
                     <tr className="bg-gray-50/80 dark:bg-gray-800/80 border-b-2 border-gray-100 dark:border-gray-800">
                       <th className="text-left px-5 py-3.5 font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs">
+                        No
+                      </th>
+                      <th className="text-left px-5 py-3.5 font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs">
                         Donatur
                       </th>
                       <th className="text-left px-5 py-3.5 font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs">
@@ -548,11 +541,16 @@ export default function AdminDonasiPage() {
                     {(() => {
                       const totalPages = Math.ceil(donations.length / D_PER_PAGE);
                       const paginatedDonations = donations.slice((dPage - 1) * D_PER_PAGE, dPage * D_PER_PAGE);
-                      return paginatedDonations.map((donation) => (
+                      return paginatedDonations.map((donation, index) => (
                       <tr
                         key={donation.id}
                         className="hover:bg-emerald-50/40 dark:hover:bg-gray-800/50 transition-colors group"
                       >
+                         <td className="px-5 py-4">
+                          <p className="font-semibold text-gray-800 dark:text-gray-200 max-w-[180px] truncate">
+                            {(dPage - 1) * D_PER_PAGE + index + 1}
+                          </p>
+                        </td>
                         {/* Donatur */}
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-3">
@@ -651,18 +649,39 @@ export default function AdminDonasiPage() {
               {/* Pagination bar */}
               {(() => {
                 const totalPages = Math.ceil(donations.length / D_PER_PAGE);
-                if (totalPages <= 1) return null;
+                if (donations.length === 0) return null;
                 return (
-                  <div className="border-t-2 border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 px-5 py-3 flex items-center justify-between">
-                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-                      <span className="text-gray-800 dark:text-gray-200">{(dPage - 1) * D_PER_PAGE + 1}</span>
-                      {" – "}
-                      <span className="text-gray-800 dark:text-gray-200">{Math.min(dPage * D_PER_PAGE, donations.length)}</span>
-                      {" dari "}
-                      <span className="text-gray-800 dark:text-gray-200">{donations.length}</span>
-                      {" donasi pending"}
-                    </p>
-                    <div className="flex items-center gap-2">
+                  <div className="border-t-2 border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 px-5 py-3 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">Tampilkan:</span>
+                        <select
+                          value={dPerPage}
+                          onChange={(e) => {
+                            setDPerPage(e.target.value === "ALL" ? "ALL" : Number(e.target.value));
+                            setDPage(1);
+                          }}
+                          className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm font-semibold py-1 px-2 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 dark:text-gray-200 transition-all cursor-pointer shadow-sm"
+                        >
+                          <option value={10}>10</option>
+                          <option value={20}>20</option>
+                          <option value={50}>50</option>
+                          <option value={100}>100</option>
+                          <option value="ALL">Semua</option>
+                        </select>
+                      </div>
+                      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                        <span className="text-gray-800 dark:text-gray-200">{(dPage - 1) * D_PER_PAGE + 1}</span>
+                        {" – "}
+                        <span className="text-gray-800 dark:text-gray-200">{Math.min(dPage * D_PER_PAGE, donations.length)}</span>
+                        {" dari "}
+                        <span className="text-gray-800 dark:text-gray-200">{donations.length}</span>
+                        {" donasi"}
+                      </p>
+                    </div>
+
+                    {totalPages > 1 && (
+                      <div className="flex items-center gap-2">
                       <Button
                         variant="outline" size="sm"
                         onClick={() => setDPage(p => Math.max(1, p - 1))}
@@ -671,9 +690,26 @@ export default function AdminDonasiPage() {
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </Button>
-                      <span className="text-sm font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg w-8 h-8 flex items-center justify-center">
-                        {dPage}
-                      </span>
+                      
+                      {Array.from({ length: totalPages }, (_, i) => i + 1)
+                        .filter(p => totalPages <= 5 || p === 1 || p === totalPages || Math.abs(p - dPage) <= 1)
+                        .map((p, i, arr) => (
+                          <div key={p} className="flex gap-1 items-center">
+                            {i > 0 && p - arr[i - 1] > 1 && <span className="text-gray-400 dark:text-gray-500 font-bold px-1">...</span>}
+                            <Button 
+                              variant={dPage === p ? 'default' : 'outline'} 
+                              size="sm"
+                              onClick={() => setDPage(p)}
+                              className={dPage === p 
+                                ? "bg-emerald-600 hover:bg-emerald-700 text-white font-black dark:bg-emerald-600 dark:hover:bg-emerald-700 border-none shadow-md h-8 w-8 p-0" 
+                                : "border-2 font-bold text-gray-600 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 h-8 w-8 p-0"}
+                            >
+                              {p}
+                            </Button>
+                          </div>
+                        ))
+                      }
+
                       <Button
                         variant="outline" size="sm"
                         onClick={() => setDPage(p => Math.min(totalPages, p + 1))}
@@ -683,6 +719,7 @@ export default function AdminDonasiPage() {
                         <ChevronRight className="w-4 h-4" />
                       </Button>
                     </div>
+                    )}
                   </div>
                 );
               })()}

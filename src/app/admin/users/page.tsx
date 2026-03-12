@@ -455,9 +455,26 @@ export default function AdminUsersPage() {
                       <ChevronLeft className="w-4 h-4 mr-1" />
                       Prev
                     </Button>
-                    <div className="flex items-center justify-center min-w-[32px] font-black text-sm text-violet-700 dark:text-violet-300 bg-violet-100 dark:bg-violet-900/50 rounded-md">
-                      {currentPage}
-                    </div>
+                    
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter(p => totalPages <= 5 || p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                      .map((p, i, arr) => (
+                        <div key={p} className="flex gap-1 items-center">
+                          {i > 0 && p - arr[i - 1] > 1 && <span className="text-gray-400 dark:text-gray-500 font-bold px-1">...</span>}
+                          <Button 
+                            variant={currentPage === p ? 'default' : 'outline'} 
+                            size="sm"
+                            onClick={() => setCurrentPage(p)}
+                            className={currentPage === p 
+                              ? "bg-violet-600 hover:bg-violet-700 text-white font-black dark:bg-violet-600 dark:hover:bg-violet-700 border-none shadow-md" 
+                              : "border-2 font-bold text-gray-600 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"}
+                          >
+                            {p}
+                          </Button>
+                        </div>
+                      ))
+                    }
+
                     <Button
                       variant="outline"
                       size="sm"

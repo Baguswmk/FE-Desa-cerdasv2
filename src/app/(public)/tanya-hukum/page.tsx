@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { aiService } from "@/services/ai.service";
 import { useAuth } from "@/hooks/useAuth";
+import ConfirmModal from "@/components/ConfirmModal";
 
 const exampleQuestions = [
   "Bagaimana prosedur pengurusan KTP yang hilang?",
@@ -51,10 +52,13 @@ export default function TanyaHukumPage() {
   const [loading, setLoading] = useState(false);
   const [quota, setQuota] = useState<number | null>(null);
 
-  // Chat Room states
   const [sessions, setSessions] = useState<Session[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<{ isOpen: boolean; sessionId: string | null }>({
+    isOpen: false,
+    sessionId: null,
+  });
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -82,7 +86,7 @@ export default function TanyaHukumPage() {
           const grouped: Record<string, Session> = {};
           
           historyData.reverse().forEach((q: any) => {
-            const sid = q.session_id || "default";
+            const sid = q.session_id || "null";
             if (!grouped[sid]) {
               grouped[sid] = {
                 id: sid,
@@ -184,11 +188,17 @@ export default function TanyaHukumPage() {
     if (isSidebarOpen) setIsSidebarOpen(false);
   };
 
-  const handleDeleteSession = async (sessionId: string, e: React.MouseEvent) => {
+  const handleDeleteSessionClick = (sessionId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm("Apakah Anda yakin ingin menghapus obrolan ini?")) return;
+    setConfirmDelete({ isOpen: true, sessionId });
+  };
+
+  const handleConfirmDelete = async () => {
+    const sessionId = confirmDelete.sessionId;
+    if (!sessionId) return;
     
     try {
+      setConfirmDelete({ isOpen: false, sessionId: null });
       await aiService.deleteHistorySession(sessionId);
       if (activeSessionId === sessionId) {
         setActiveSessionId(null);
@@ -282,7 +292,7 @@ export default function TanyaHukumPage() {
                         </div>
                       </div>
                       <button 
-                        onClick={(e) => handleDeleteSession(session.id, e)}
+                        onClick={(e) => handleDeleteSessionClick(session.id, e)}
                         className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 rounded-md transition-all shrink-0"
                         title="Hapus Obrolan"
                       >
@@ -518,6 +528,13 @@ export default function TanyaHukumPage() {
                         <MessageSquare className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                         <span className="truncate text-sm font-medium dark:text-gray-200">{session.title}</span>
                       </div>
+                      <button 
+                        onClick={(e) => handleDeleteSessionClick(session.id, e)}
+                        className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 rounded-md transition-all shrink-0"
+                        title="Hapus Obrolan"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   ))
                 )}
@@ -619,6 +636,14 @@ export default function TanyaHukumPage() {
           </CardContent>
         </Card>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmDelete.isOpen}
+        onClose={() => setConfirmDelete({ isOpen: false, sessionId: null })}
+        onConfirm={handleConfirmDelete}
+        title="Hapus Obrolan"
+        description="Apakah Anda yakin ingin menghapus obrolan ini? Tindakan ini tidak dapat dibatalkan."
+      />
 
     </div>
   );

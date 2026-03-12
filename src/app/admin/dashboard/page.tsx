@@ -665,9 +665,24 @@ export default function AdminDashboardPage() {
                       <ChevronLeft className="w-4 h-4" />
                     </Button>
 
-                    <span className="text-sm font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg w-8 h-8 flex items-center justify-center">
-                      {logPage}
-                    </span>
+                    {Array.from({ length: totalPageLogs }, (_, i) => i + 1)
+                      .filter(p => totalPageLogs <= 5 || p === 1 || p === totalPageLogs || Math.abs(p - logPage) <= 1)
+                      .map((p, i, arr) => (
+                        <div key={p} className="flex gap-1 items-center">
+                          {i > 0 && p - arr[i - 1] > 1 && <span className="text-gray-400 dark:text-gray-500 font-bold px-1">...</span>}
+                          <Button 
+                            variant={logPage === p ? 'default' : 'outline'} 
+                            size="sm"
+                            onClick={() => setLogPage(p)}
+                            className={logPage === p 
+                              ? "bg-emerald-600 hover:bg-emerald-700 text-white font-black dark:bg-emerald-600 dark:hover:bg-emerald-700 border-none shadow-md h-8 w-8 p-0" 
+                              : "border-2 font-bold text-gray-600 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-800 h-8 w-8 p-0"}
+                          >
+                            {p}
+                          </Button>
+                        </div>
+                      ))
+                    }
 
                     <Button
                       variant="outline"
