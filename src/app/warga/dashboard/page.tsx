@@ -22,6 +22,8 @@ import {
   Eye,
   TrendingUp,
   Sparkles,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { donasiService } from "@/services/donasi.service";
 import { smartFarmService } from "@/services/smartfarm.service";
@@ -35,6 +37,8 @@ export default function WargaDashboardPage() {
   const [donations, setDonations] = useState<Donation[]>([]);
   const [farms, setFarms] = useState<SmartFarm[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dPage, setDPage] = useState(1);
+  const [dPerPage, setDPerPage] = useState<number | "ALL">(10);
 
   useEffect(() => {
     if (user) {
@@ -99,6 +103,10 @@ export default function WargaDashboardPage() {
   if (loading || !user) {
     return <LoadingScreen message="Memuat dashboard..." />;
   }
+
+  const D_PER_PAGE = dPerPage === "ALL" ? donations.length || 1 : dPerPage;
+  const totalDonationPages = Math.ceil(donations.length / D_PER_PAGE);
+  const paginatedDonations = donations.slice((dPage - 1) * D_PER_PAGE, dPage * D_PER_PAGE);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-emerald-50/30 dark:from-gray-950 dark:to-emerald-950/20 relative overflow-hidden">
@@ -281,6 +289,9 @@ export default function WargaDashboardPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b-2 border-emerald-100 dark:border-gray-800">
+                      <th className="text-left p-4 font-black text-gray-700 dark:text-gray-300 uppercase tracking-wider text-sm w-12">
+                        No
+                      </th>
                       <th className="text-left p-4 font-black text-gray-700 dark:text-gray-300 uppercase tracking-wider text-sm">
                         Kegiatan
                       </th>
@@ -296,11 +307,16 @@ export default function WargaDashboardPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {donations.map((donation) => (
-                      <tr
+                    {paginatedDonations.map((donation, index) => (
+                       <tr
                         key={donation.id}
                         className="border-b border-gray-100 dark:border-gray-800 hover:bg-emerald-50/50 dark:hover:bg-gray-800/50 transition-colors"
                       >
+                        <td className="p-4">
+                          <span className="font-semibold text-gray-500 dark:text-gray-400 text-sm">
+                            {(dPage - 1) * D_PER_PAGE + index + 1}
+                          </span>
+                        </td>
                         <td className="p-4">
                           <p className="font-bold text-gray-900 dark:text-gray-100">
                             {donation.kegiatan?.title || "N/A"}
@@ -338,6 +354,82 @@ export default function WargaDashboardPage() {
                 </table>
               </div>
             )}
+
+            {/* Pagination */}
+            {donations.length > 0 && (() => {
+              return (
+                <div className="border-t-2 border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 px-5 py-3 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">Tampilkan:</span>
+                      <select
+                        value={dPerPage}
+                        onChange={(e) => {
+                          setDPerPage(e.target.value === "ALL" ? "ALL" : Number(e.target.value));
+                          setDPage(1);
+                        }}
+                        className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm font-semibold py-1 px-2 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 dark:text-gray-200 transition-all cursor-pointer shadow-sm"
+                      >
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                        <option value="ALL">Semua</option>
+                      </select>
+                    </div>
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                      <span className="text-gray-800 dark:text-gray-200">{(dPage - 1) * D_PER_PAGE + 1}</span>
+                      {" – "}
+                      <span className="text-gray-800 dark:text-gray-200">{Math.min(dPage * D_PER_PAGE, donations.length)}</span>
+                      {" dari "}
+                      <span className="text-gray-800 dark:text-gray-200">{donations.length}</span>
+                      {" donasi"}
+                    </p>
+                  </div>
+
+                  {totalDonationPages > 1 && (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline" size="sm"
+                        onClick={() => setDPage(p => Math.max(1, p - 1))}
+                        disabled={dPage === 1}
+                        className="border-2 font-bold h-8 w-8 p-0 dark:border-gray-700 dark:hover:bg-gray-800"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </Button>
+
+                      {Array.from({ length: totalDonationPages }, (_, i) => i + 1)
+                        .filter(p => totalDonationPages <= 5 || p === 1 || p === totalDonationPages || Math.abs(p - dPage) <= 1)
+                        .map((p, i, arr) => (
+                          <div key={p} className="flex gap-1 items-center">
+                            {i > 0 && p - arr[i - 1] > 1 && <span className="text-gray-400 dark:text-gray-500 font-bold px-1">...</span>}
+                            <Button
+                              variant={dPage === p ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => setDPage(p)}
+                              className={dPage === p
+                                ? "bg-emerald-600 hover:bg-emerald-700 text-white font-black dark:bg-emerald-600 dark:hover:bg-emerald-700 border-none shadow-md h-8 w-8 p-0"
+                                : "border-2 font-bold text-gray-600 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-800 h-8 w-8 p-0"}
+                            >
+                              {p}
+                            </Button>
+                          </div>
+                        ))
+                      }
+
+                      <Button
+                        variant="outline" size="sm"
+                        onClick={() => setDPage(p => Math.min(totalDonationPages, p + 1))}
+                        disabled={dPage === totalDonationPages}
+                        className="border-2 font-bold h-8 w-8 p-0 dark:border-gray-700 dark:hover:bg-gray-800"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </CardContent>
         </Card>
 

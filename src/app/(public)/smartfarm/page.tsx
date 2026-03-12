@@ -237,10 +237,11 @@ export default function SmartFarmPage() {
   const maxQuota = user ? 50 : 10;
   const usedQuota = quota !== null ? maxQuota - quota : null;
 
-  // Auto-scroll to bottom when messages change
-  const chatBottomRef = useRef<HTMLDivElement>(null);
+  // Auto-scroll to bottom when messages change — only inside the chat container
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = chatContainerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [chatMessages, activeSessionId]);
 
   // Auto-focus chat input ref
@@ -1063,7 +1064,7 @@ export default function SmartFarmPage() {
               </CardHeader>
 
               <CardContent className="p-0 flex flex-col flex-1 overflow-hidden">
-                <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
                   {chatMessages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 text-center h-full">
                       <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-4">
@@ -1124,8 +1125,7 @@ export default function SmartFarmPage() {
                           </div>
                         </div>
                       )}
-                      {/* Sentinel element for auto-scroll */}
-                      <div ref={chatBottomRef} />
+
                     </>
                   )}
                 </div>

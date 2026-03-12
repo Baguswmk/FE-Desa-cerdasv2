@@ -213,7 +213,7 @@ export default function KegiatanPage() {
                   {loading ? (
                     <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-600 dark:text-emerald-400" />
                   ) : (
-                    `Rp ${((stats.total_dana ?? totalDana) / 1_000_000).toFixed(1)}M`
+                    `Rp ${((stats.total_dana ?? totalDana) / 1_000_000).toFixed(1)}Jt`
                   )}
                 </div>
                 <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">Dana Terkumpul</div>
@@ -282,10 +282,9 @@ export default function KegiatanPage() {
             {displayActivities.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {displayActivities.map((activity) => (
-                    <Link href={`/kegiatan/${activity.id}`}>
+                    <Link key={activity.id} href={`/kegiatan/${activity.id}`}>
 
                   <Card
-                    key={activity.id}
                   className="group overflow-hidden border-2 border-emerald-100 dark:border-emerald-900 hover:border-emerald-300 dark:hover:border-emerald-600 hover:shadow-2xl dark:hover:shadow-emerald-900/20 transition-all duration-500 transform hover:-translate-y-2 bg-white dark:bg-gray-800"
                 >
                   {/* Image */}
@@ -355,12 +354,13 @@ export default function KegiatanPage() {
                         year: "numeric",
                       })}
                     </div>
-                    <Link href={`/kegiatan/${activity.id}`}>
-                      <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 dark:from-emerald-700 dark:to-teal-700 dark:hover:from-emerald-600 dark:hover:to-teal-600 text-white font-bold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all cursor-pointer">
-                        <Heart className="w-4 h-4 mr-1.5" />
-                        Donasi
-                      </Button>
-                    </Link>
+                    <Button
+                      onClick={(e) => e.preventDefault()}
+                      className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 dark:from-emerald-700 dark:to-teal-700 dark:hover:from-emerald-600 dark:hover:to-teal-600 text-white font-bold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all cursor-pointer"
+                    >
+                      <Heart className="w-4 h-4 mr-1.5" />
+                      Donasi
+                    </Button>
                   </CardFooter>
                 </Card>
               </Link>))}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -17,12 +18,45 @@ import {
   Zap,
   Shield,
   TrendingUp,
-  Mail,
   MapPin,
   Phone,
+  Loader2,
+  Mail,
 } from "lucide-react";
+import { kegiatanService } from "@/services/kegiatan.service";
 
 export default function TentangPage() {
+  const [statsData, setStatsData] = useState<any>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await kegiatanService.getAll();
+        const raw = res.data;
+        if (!Array.isArray(raw) && raw.stats) {
+          setStatsData(raw.stats);
+        } else {
+          // If no pre-calculated stats, calculate from list
+          const activities = Array.isArray(raw) ? raw : (raw.data ?? []);
+          const totalDana = activities.reduce((sum: number, a: any) => sum + (Number(a.current_amount) || 0), 0);
+          const activeCount = activities.filter((a: any) => a.status === "ACTIVE").length;
+          setStatsData({
+            total_kegiatan: activeCount,
+            total_dana: totalDana,
+            // fallback total_warga manually or from elsewhere if omitted
+            total_warga: activities.length > 0 ? 1247 : 0 
+          });
+        }
+      } catch (err) {
+        console.error("Gagal memuat statistik", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   const features = [
     {
       icon: ClipboardList,
@@ -50,11 +84,17 @@ export default function TentangPage() {
     },
   ];
 
+  const formatMilyar = (amount: number) => {
+    if (!amount) return "Rp 0";
+    if (amount >= 1_000_000_000) return `Rp ${(amount / 1_000_000_000).toFixed(1)}M`;
+    if (amount >= 1_000_000) return `Rp ${(amount / 1_000_000).toFixed(1)} Jt`;
+    return `Rp ${amount.toLocaleString("id-ID")}`;
+  };
+
   const stats = [
-    { icon: Users, value: "1,247", label: "Warga Terdaftar" },
-    { icon: ClipboardList, value: "28", label: "Kegiatan Aktif" },
-    { icon: Heart, value: "Rp 15.2M", label: "Dana Terkumpul" },
-    { icon: Award, value: "98%", label: "Kepuasan Pengguna" },
+    { icon: Users, value: loading ? <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-600" /> : (statsData.total_warga ?? "1,247").toLocaleString("id-ID"), label: "Warga Teraktif" },
+    { icon: ClipboardList, value: loading ? <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-600" /> : (statsData.total_kegiatan ?? 0).toString(), label: "Kegiatan Berjalan" },
+    { icon: Heart, value: loading ? <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-600" /> : formatMilyar(statsData.total_dana ?? 0), label: "Dana Terkumpul" },
   ];
 
   const team = [
@@ -170,7 +210,7 @@ export default function TentangPage() {
           <h2 className="text-display font-black text-center bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent mb-8">
             Dampak Kami
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
