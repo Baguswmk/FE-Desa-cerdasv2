@@ -48,13 +48,33 @@ export const smartFarmService = {
   //  Farm Chat (Tanya Jawab Pertanian AI)
   // ═══════════════════════════════════════════════════════════════════
 
-  async askFarmQuestion(question: string) {
-    const response = await api.post("/smartfarm/chat", { question });
+  async askFarmQuestion(
+    question: string,
+    sessionId?: string,
+    latitude?: number,
+    longitude?: number
+  ) {
+    const response = await api.post("/smartfarm/chat", {
+      question,
+      session_id: sessionId,
+      latitude,
+      longitude,
+    });
     return response.data;
   },
 
   async getFarmChatHistory() {
     const response = await api.get("/smartfarm/chat/history");
+    return response.data;
+  },
+
+  async deleteFarmChatSession(sessionId: string) {
+    const response = await api.delete(`/smartfarm/chat/history/${sessionId}`);
+    return response.data;
+  },
+
+  async getFarmChatQuota() {
+    const response = await api.get("/smartfarm/chat/quota");
     return response.data;
   },
 };

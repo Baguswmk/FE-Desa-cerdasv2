@@ -137,7 +137,8 @@ export default function AdminKegiatanPage() {
   const loadKegiatan = async () => {
     try {
       const response = await kegiatanService.getAll("ALL");
-      setKegiatan(response.data || []);
+      const raw = response.data;
+      setKegiatan(Array.isArray(raw) ? raw : (raw?.data || []));
     } catch (error) {
       console.error("Error loading kegiatan:", error);
     } finally {

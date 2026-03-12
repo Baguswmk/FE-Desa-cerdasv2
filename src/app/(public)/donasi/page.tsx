@@ -55,42 +55,18 @@ interface Stats {
 }
 
 
-const features = [
-  {
-    icon: DollarSign,
-    title: "Donasi Transparan",
-    description:
-      "Sistem donasi online dengan bukti digital dan tracking dana real-time untuk transparansi penuh.",
-    href: "/donasi",
-  },
-  {
-    icon: Scale,
-    title: "Konsultasi Hukum AI",
-    description:
-      "Dapatkan informasi hukum dasar dan prosedur administrasi desa dengan bantuan AI assistant.",
-    href: "/tanya-hukum",
-  },
-  {
-    icon: Sprout,
-    title: "Smart Farm",
-    description:
-      "Platform berbasis AI untuk membantu petani desa dalam perawatan tanaman dan prediksi cuaca.",
-    href: "/smartfarm",
-  },
-  {
-    icon: ClipboardList,
-    title: "Informasi Kegiatan",
-    description:
-      "Update real-time tentang kegiatan desa, jadwal acara, dan perkembangan program.",
-    href: "/kegiatan",
-  },
-];
 
-export default function KegiatanPage() {
+
+export default function DonasiPage() {
   const [activities, setActivities] = useState<Kegiatan[]>([]);
   const [stats, setStats] = useState<Stats>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Search & Pagination States
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
 
   const loadData = async () => {
     setLoading(true);
@@ -134,7 +110,23 @@ export default function KegiatanPage() {
   const totalDana = activities.reduce((sum, a) => sum + a.current_amount, 0);
   const activeCount = activities.filter((a) => a.status === "ACTIVE").length;
 
-  const displayActivities = activities.slice(0, 3);
+  // Filter & Pagination Logic
+  const filteredActivities = activities.filter((activity) =>
+    activity.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    activity.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    activity.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredActivities.length / ITEMS_PER_PAGE);
+  const paginatedActivities = filteredActivities.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1); // Reset to first page
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 dark:from-emerald-950 dark:via-teal-950 dark:to-green-950 transition-colors duration-300">
@@ -144,95 +136,19 @@ export default function KegiatanPage() {
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-teal-200/20 dark:bg-teal-800/20 rounded-full blur-3xl animate-pulse [animation-delay:1000ms]"></div>
       </div>
 
-      <Navbar currentPage="kegiatan" />
+      <Navbar currentPage="donasi" />
 
-      {/* ── HERO ── */}
-      <section className="relative overflow-hidden py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Badge */}
-          <div className="flex justify-center mb-6">
-            <Badge className="bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800/60 px-6 py-2 text-sm font-semibold border border-emerald-200 dark:border-emerald-700/50 shadow-sm">
-              <span className="relative flex h-2 w-2 mr-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 dark:bg-emerald-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 dark:bg-emerald-400"></span>
-              </span>
-              Platform Digital untuk Desa Modern
-            </Badge>
-          </div>
-
-          <h1 className="text-hero font-black text-center mb-6">
-            <span className="bg-gradient-to-r from-emerald-700 via-teal-700 to-green-700 dark:from-emerald-400 dark:via-teal-400 dark:to-green-400 bg-clip-text text-transparent">
-              Bangun Desa Bersama,
-            </span>
-            <br />
-            <span className="bg-gradient-to-r from-teal-700 via-emerald-700 to-green-700 dark:from-teal-400 dark:via-emerald-400 dark:to-green-400 bg-clip-text text-transparent">
-              Transparan &amp; Terpercaya
-            </span>
-          </h1>
-
-          <p className="text-subtitle text-gray-600 dark:text-gray-300 text-center max-w-3xl mx-auto mb-10">
-            Sistem informasi terintegrasi untuk memudahkan partisipasi warga
-            dalam kegiatan desa. Donasi online, edukasi hukum AI, dan smart
-            farming dalam satu platform.
-          </p>
-
-          {/* Stats — dari API kalau ada, fallback ke hitung lokal */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <Card className="border-2 border-emerald-100 dark:border-emerald-800 hover:border-emerald-300 dark:hover:border-emerald-600 hover:shadow-xl dark:hover:shadow-emerald-900/20 transition-all duration-300 transform hover:-translate-y-1 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-              <CardContent className="p-6 text-center">
-                <Users className="w-10 h-10 text-emerald-600 dark:text-emerald-400 mx-auto mb-3" />
-                <div className="text-4xl font-black bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent mb-1">
-                  {loading ? (
-                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-600 dark:text-emerald-400" />
-                  ) : (
-                    (stats.total_warga ?? "—").toLocaleString("id-ID")
-                  )}
-                </div>
-                <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">Warga Aktif</div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-emerald-100 dark:border-emerald-800 hover:border-emerald-300 dark:hover:border-emerald-600 hover:shadow-xl dark:hover:shadow-emerald-900/20 transition-all duration-300 transform hover:-translate-y-1 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-              <CardContent className="p-6 text-center">
-                <ClipboardList className="w-10 h-10 text-teal-600 dark:text-teal-400 mx-auto mb-3" />
-                <div className="text-4xl font-black bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent mb-1">
-                  {loading ? (
-                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-600 dark:text-emerald-400" />
-                  ) : (
-                    stats.total_kegiatan ?? activeCount
-                  )}
-                </div>
-                <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">Kegiatan Berjalan</div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-emerald-100 dark:border-emerald-800 hover:border-emerald-300 dark:hover:border-emerald-600 hover:shadow-xl dark:hover:shadow-emerald-900/20 transition-all duration-300 transform hover:-translate-y-1 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-              <CardContent className="p-6 text-center">
-                <TrendingUp className="w-10 h-10 text-green-600 dark:text-green-400 mx-auto mb-3" />
-                <div className="text-4xl font-black bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent mb-1">
-                  {loading ? (
-                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-600 dark:text-emerald-400" />
-                  ) : (
-                    `Rp ${((stats.total_dana ?? totalDana) / 1_000_000).toFixed(1)}M`
-                  )}
-                </div>
-                <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">Dana Terkumpul</div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
 
       {/* ── ACTIVITIES ── */}
       <section className="py-16 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-display font-black mb-4 bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
-              Kegiatan Desa Aktif
+              Daftar Donasi & Kegiatan
             </h2>
             <p className="text-subtitle text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Dukung berbagai program pembangunan dan kegiatan desa dengan
-              donasi yang transparan dan terverifikasi
+              Temukan dan dukung berbagai kegiatan desa yang membutuhkan uluran tangan Anda.
+              Setiap donasi disalurkan secara transparan.
             </p>
           </div>
 
@@ -274,16 +190,31 @@ export default function KegiatanPage() {
             </div>
           )}
 
-
+          {/* Search Bar */}
+          {!loading && !error && activities.length > 0 && (
+            <div className="max-w-xl mx-auto mb-10">
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Cari kegiatan, kategori, atau deskripsi..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  className="block w-full pl-11 pr-4 py-3 border-2 border-emerald-100 dark:border-emerald-900/50 rounded-2xl leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-emerald-500 dark:focus:border-emerald-500 transition-all shadow-sm group-hover:shadow-md"
+                />
+              </div>
+            </div>
+          )}
 
           {/* Activities Grid */}
           {!loading && !error && activities.length > 0 && (
             <>
-            {displayActivities.length > 0 ? (
+            {paginatedActivities.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {displayActivities.map((activity) => (
-                    <Link href={`/kegiatan/${activity.id}`}>
-
+                {paginatedActivities.map((activity) => (
+                 <Link href={`/kegiatan/${activity.id}`}>
                   <Card
                     key={activity.id}
                   className="group overflow-hidden border-2 border-emerald-100 dark:border-emerald-900 hover:border-emerald-300 dark:hover:border-emerald-600 hover:shadow-2xl dark:hover:shadow-emerald-900/20 transition-all duration-500 transform hover:-translate-y-2 bg-white dark:bg-gray-800"
@@ -365,66 +296,61 @@ export default function KegiatanPage() {
                 </Card>
               </Link>))}
               </div>
-            ) : null}
+            ) : (
+              <div className="text-center py-16">
+                <div className="inline-block p-4 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
+                  <Search className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">Pencarian Tidak Ditemukan</h3>
+                <p className="text-gray-500 dark:text-gray-400">Kami tidak menemukan kegiatan yang sesuai dengan kata kunci "{searchQuery}"</p>
+              </div>
+            )}
 
-            {/* Lihat Selanjutnya Button */}
-            <div className="mt-12 flex justify-center">
-              <Link href="/donasi">
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-12">
                 <Button
-                  size="lg"
-                  className="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-bold rounded-xl shadow-lg transform hover:-translate-y-1 transition-all px-8 py-6 text-lg cursor-pointer"
+                  variant="outline"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="rounded-xl border-2 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300 w-10 h-10 p-0"
                 >
-                  Lihat Selanjutnya
-                  <ArrowRight className="ml-2 w-5 h-5" />
+                  <ChevronLeft className="w-5 h-5" />
                 </Button>
-              </Link>
-            </div>
+                
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      onClick={() => setCurrentPage(page)}
+                      className={`w-10 h-10 p-0 rounded-xl font-bold transition-all ${
+                        currentPage === page 
+                          ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md border-transparent" 
+                          : "border-2 hover:border-emerald-300 hover:text-emerald-700 dark:border-gray-700 dark:hover:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                      }`}
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                </div>
+
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="rounded-xl border-2 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300 w-10 h-10 p-0"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </Button>
+              </div>
+            )}
             </>
           )}
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
-      <section className="py-16 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-display font-black mb-4 bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
-              Fitur Unggulan Kami
-            </h2>
-            <p className="text-subtitle text-gray-600 max-w-2xl mx-auto">
-              Teknologi modern untuk memberdayakan desa dan meningkatkan
-              partisipasi warga
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Link href={feature.href} key={index} className="block">
-                  <Card
-                    className="h-full group border-2 border-emerald-100 hover:border-emerald-400 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 bg-white/80 backdrop-blur-sm"
-                  >
-                    <CardHeader>
-                      <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-                        <Icon className="w-8 h-8" />
-                      </div>
-                      <CardTitle className="text-xl font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">
-                        {feature.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-gray-600 leading-relaxed">
-                        {feature.description}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
       {/* ── CTA ── */}
       <section className="py-20 bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 dark:from-emerald-900 dark:via-teal-900 dark:to-green-900 relative overflow-hidden">
@@ -486,7 +412,6 @@ export default function KegiatanPage() {
               <ul className="space-y-2">
                 {[
                   { href: "/kegiatan", label: "Kegiatan" },
-                  { href: "/donasi", label: "Donasi" },
                   { href: "/smartfarm", label: "Smart Farm" },
                   { href: "/tanya-hukum", label: "Tanya Hukum" },
                   { href: "/tentang", label: "Tentang Kami" },

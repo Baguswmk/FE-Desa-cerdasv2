@@ -428,11 +428,11 @@ export default function RegisterPage() {
         <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400 animate-fade-in animation-delay-500">
           <p>
             Dengan mendaftar, Anda menyetujui{' '}
-            <Link href="/terms" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 hover:underline">
+            <Link href="/kebijakan" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 hover:underline">
               Syarat & Ketentuan
             </Link>
             {' '}dan{' '}
-            <Link href="/privacy" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 hover:underline">
+            <Link href="/kebijakan" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 hover:underline">
               Kebijakan Privasi
             </Link>
             {' '}kami

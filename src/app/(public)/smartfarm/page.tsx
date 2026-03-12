@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,8 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -21,12 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import {
   Sprout,
   CloudRain,
-  Thermometer,
   Droplets,
-  Sun,
   Wind,
   Calendar,
   AlertTriangle,
@@ -34,19 +31,23 @@ import {
   Leaf,
   Bug,
   Zap,
-  MessageCircle,
   Send,
   Loader2,
   Bot,
   User,
   MapPin,
   RefreshCw,
-  Eye,
   ExternalLink,
   ChevronDown,
   ChevronUp,
+  MapPinOff,
+  MessageCircle,
+  Plus,
+  Trash2,
+  MessageSquare,
 } from "lucide-react";
 import { smartFarmService } from "@/services/smartfarm.service";
+import { useAuth } from "@/hooks/useAuth";
 
 // ─── BMKG Data Wilayah Pringsewu ──────────────────────────────────────────────
 // Sumber: BMKG Open Data (https://api.bmkg.go.id)
@@ -144,6 +145,14 @@ interface BmkgResponse {
   data: Array<{ cuaca: BmkgForecast[][] }>;
 }
 
+type Message = { role: "user" | "bot"; text: string };
+type Session = {
+  id: string;
+  title: string;
+  messages: Message[];
+  createdAt: string;
+};
+
 export default function SmartFarmPage() {
   type CropKey = "padi" | "jagung" | "cabai" | "tomat" | "sayuran";
   const [selectedCrop, setSelectedCrop] = useState<CropKey>("padi");
@@ -203,26 +212,170 @@ export default function SmartFarmPage() {
     (w) => w.kode === selectedDesa,
   );
 
-  // Farm Chat AI
+  // Farm Chat AI & Location
+  const { user } = useAuth();
   const [chatQuestion, setChatQuestion] = useState("");
-  const [chatMessages, setChatMessages] = useState<
-    { role: "user" | "bot"; text: string }[]
-  >([]);
+  const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
+  
+  // Chat Room states
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  // Location detection
+  const [locationEnabled, setLocationEnabled] = useState(false);
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [locationLoading, setLocationLoading] = useState(false);
 
-  const handleAskFarm = async () => {
-    if (!chatQuestion.trim() || chatLoading) return;
-    const question = chatQuestion.trim();
+  // Quota counter
+  const [quota, setQuota] = useState<number | null>(null);
+  const maxQuota = user ? 50 : 10;
+  const usedQuota = quota !== null ? maxQuota - quota : null;
+
+  // Auto-scroll to bottom when messages change
+  const chatBottomRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages, activeSessionId]);
+
+  // Auto-focus chat input ref
+  const chatInputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    // Load quota on mount
+    smartFarmService.getFarmChatQuota()
+      .then((res) => setQuota(res.data?.remaining_quota ?? res.data ?? null))
+      .catch(() => {});
+
+    if (user) {
+      loadChatHistory();
+    }
+  }, [user]);
+
+  const loadChatHistory = async () => {
+    try {
+      const history = await smartFarmService.getFarmChatHistory();
+      if (history.data) {
+        // Group by session_id
+        const grouped: Record<string, Session> = {};
+        
+        [...history.data].reverse().forEach((msg: any) => {
+          const sid = msg.session_id || "default";
+          if (!grouped[sid]) {
+            grouped[sid] = {
+              id: sid,
+              title: msg.question.substring(0, 30) + (msg.question.length > 30 ? "..." : ""),
+              messages: [],
+              createdAt: msg.created_at,
+            };
+          }
+          grouped[sid].messages.push({ role: "user", text: msg.question });
+          grouped[sid].messages.push({ role: "bot", text: msg.answer });
+        });
+
+        const sessionList = Object.values(grouped).sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
+        setSessions(sessionList);
+
+        if (sessionList.length > 0 && !activeSessionId) {
+          setActiveSessionId(sessionList[0].id);
+        } else if (sessionList.length === 0) {
+          setChatMessages([]);
+          setActiveSessionId(null);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load chat history:", error);
+    }
+  };
+
+  // Update visible messages when activeSessionId changes
+  useEffect(() => {
+    if (activeSessionId) {
+      const session = sessions.find((s) => s.id === activeSessionId);
+      if (session) {
+        setChatMessages(session.messages);
+      } else {
+        setChatMessages([]);
+      }
+    } else {
+      setChatMessages([]);
+    }
+  }, [activeSessionId, sessions]);
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Browser Anda tidak mendukung deteksi lokasi.");
+      return;
+    }
+    setLocationLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        });
+        setLocationEnabled(true);
+        setLocationLoading(false);
+      },
+      (error) => {
+        console.error("Error getting location", error);
+        alert("Gagal mendapatkan lokasi. Pastikan Anda mengizinkan akses lokasi.");
+        setLocationEnabled(false);
+        setUserLocation(null);
+        setLocationLoading(false);
+      }
+    );
+  };
+
+  const handleAskFarm = async (promptOverride?: string) => {
+    const question = (promptOverride || chatQuestion).trim();
+    if (!question || chatLoading) return;
+    if (quota === 0) {
+      setChatMessages((prev) => [...prev, { role: "bot", text: `⚠️ Kuota harian Anda sudah habis (${maxQuota} pertanyaan).${!user ? " Login untuk kuota lebih banyak (50/hari)." : ""}` }]);
+      return;
+    }
+    
     setChatMessages((prev) => [...prev, { role: "user", text: question }]);
     setChatQuestion("");
+    // Return focus to input immediately after clearing
+    setTimeout(() => chatInputRef.current?.focus(), 0);
     setChatLoading(true);
     try {
-      const response = await smartFarmService.askFarmQuestion(question);
+      const response = await smartFarmService.askFarmQuestion(
+        question, 
+        activeSessionId || undefined,
+        userLocation?.lat, 
+        userLocation?.lng
+      );
       const answer =
         response.data?.answer ||
         response.data?.data?.answer ||
         "Maaf, tidak ada jawaban.";
-      setChatMessages((prev) => [...prev, { role: "bot", text: answer }]);
+      
+      const newSessionId = response.data?.session_id || response.data?.data?.session_id;
+      const remQuota = response.data?.remaining_quota ?? response.data?.data?.remaining_quota;
+      if (remQuota !== undefined) setQuota(remQuota);
+
+      if (!activeSessionId && newSessionId) {
+        setActiveSessionId(newSessionId);
+        loadChatHistory();
+      } else {
+        setChatMessages((prev) => [...prev, { role: "bot", text: answer }]);
+        setSessions(prevSessions => prevSessions.map(s => {
+          if (s.id === activeSessionId) {
+            return {
+              ...s,
+              messages: [...s.messages, { role: "user", text: question }, { role: "bot", text: answer }]
+            };
+          }
+          return s;
+        }));
+      }
+
     } catch (error: unknown) {
       const msg =
         (error as { response?: { data?: { message?: string } } })?.response
@@ -233,40 +386,25 @@ export default function SmartFarmPage() {
     }
   };
 
-  // ── AI Crop Recommendation ────────────────────────────────────────────────
-  const [recPlantName, setRecPlantName] = useState("");
-  const [recPlantDate, setRecPlantDate] = useState("");
-  const [recResult, setRecResult] = useState("");
-  const [recLoading, setRecLoading] = useState(false);
+  const handleNewChat = () => {
+    setActiveSessionId(null);
+    setChatMessages([]);
+    if (isSidebarOpen) setIsSidebarOpen(false);
+  };
 
-  const handleGenerateRecommendation = async () => {
-    setRecLoading(true);
-    setRecResult("");
+  const handleDeleteSession = async (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm("Apakah Anda yakin ingin menghapus obrolan ini?")) return;
+    
     try {
-      const locationStr = selectedDesaEntry
-        ? `${selectedDesaEntry.desa}, Kec. ${selectedDesaEntry.kecamatan}`
-        : "lokasi tersebut";
-      let prompt = "";
-
-      if (!recPlantName.trim()) {
-        prompt = `SAYA INGIN REKOMENDASI TANAMAN: Di lokasi ${locationStr}, tanaman apa yang paling cocok untuk ditanam saat ini melihat kondisi cuacanya? Mohon berikan beberapa rekomendasi tanaman beserta alasannya secara terstruktur.`;
-      } else {
-        const dateStr = recPlantDate
-          ? `pada tanggal ${recPlantDate}`
-          : "dalam waktu dekat";
-        prompt = `SAYA INGIN PANDUAN TANAM: Saya berencana menanam ${recPlantName} ${dateStr} di lokasi ${locationStr}. Tolong berikan panduan terstruktur meliputi:\n1. Tata cara penanaman\n2. Panduan perawatan & pantangan\n3. Perkiraan masa panen`;
+      await smartFarmService.deleteFarmChatSession(sessionId);
+      if (activeSessionId === sessionId) {
+        setActiveSessionId(null);
+        setChatMessages([]);
       }
-
-      const response = await smartFarmService.askFarmQuestion(prompt);
-      const answer =
-        response.data?.answer ||
-        response.data?.data?.answer ||
-        "Maaf, gagal membuat rekomendasi.";
-      setRecResult(answer);
-    } catch (error: unknown) {
-      setRecResult("Gagal mendapatkan rekomendasi. Silakan coba lagi nanti.");
-    } finally {
-      setRecLoading(false);
+      loadChatHistory();
+    } catch (error) {
+      alert("Gagal menghapus obrolan");
     }
   };
 
@@ -783,187 +921,300 @@ export default function SmartFarmPage() {
             </CardContent>
           </Card>
 
-          {/* AI Crop Recommendation Generator */}
-          <Card className="border-2 border-emerald-100 dark:border-gray-800 dark:bg-gray-800 shadow-2xl animate-fade-in-up animation-delay-500 overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-800 dark:to-teal-800 text-white relative">
-              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white to-transparent"></div>
-              <div className="flex items-center gap-3 relative z-10">
-                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
-                  <Sparkles className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl font-black text-white">
-                    Rekomendasi Tanam AI
-                  </CardTitle>
-                  <CardDescription className="text-emerald-50 dark:text-gray-300">
-                    Masukkan tanaman dan tanggal, atau biarkan kosong untuk
-                    mendapatkan rekomendasi tanaman terbaik di lokasimu
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid md:grid-cols-2 gap-5 mb-6">
-                <div className="space-y-2">
-                  <Label className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                    Nama Tanaman <span className="text-gray-400 dark:text-gray-500 font-normal">(opsional)</span>
-                  </Label>
-                  <Input
-                    placeholder="Contoh: Padi, Jagung, Cabai..."
-                    value={recPlantName}
-                    onChange={(e) => setRecPlantName(e.target.value)}
-                    className="border-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 focus-visible:ring-emerald-500 h-12"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                    Tanggal Tanam <span className="text-gray-400 dark:text-gray-500 font-normal">(opsional)</span>
-                  </Label>
-                  <Input
-                    type="date"
-                    value={recPlantDate}
-                    onChange={(e) => setRecPlantDate(e.target.value)}
-                    className="border-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 focus-visible:ring-emerald-500 h-12"
-                  />
-                </div>
-              </div>
-              <div className="flex items-center justify-between mb-8 py-4 border-y-2 border-emerald-50 dark:border-gray-700 border-dashed">
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 font-medium">
-                  <MapPin className="w-4 h-4 text-emerald-500" />
-                  Lokasi Terpilih: {selectedDesaEntry?.desa}, Kec.{" "}
-                  {selectedDesaEntry?.kecamatan}
-                </div>
-                <Button
-                  onClick={handleGenerateRecommendation}
-                  disabled={recLoading}
-                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold h-12 px-8 shadow-lg shadow-emerald-200 dark:shadow-none transition-all transform hover:-translate-y-0.5"
-                >
-                  {recLoading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Menganalisis...
-                    </>
-                  ) : (
-                    <>
-                      <Bot className="w-5 h-5 md:mr-2 " />
-                      <p className="text-sm hidden md:inline">Generate Rekomendasi</p>
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              {/* Result Area */}
-              {recResult && (
-                <div className="mt-6 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/10 dark:to-teal-900/10 border-2 border-emerald-100 dark:border-gray-700 rounded-2xl p-6 shadow-inner relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-200/20 rounded-bl-full -z-10 blur-xl"></div>
-                  <h3 className="text-lg font-black text-emerald-800 dark:text-emerald-400 mb-4 flex items-center gap-2 border-b-2 border-emerald-100/50 dark:border-gray-700 pb-3">
-                    <Leaf className="w-5 h-5" />
-                    Hasil Analisis AI
-                  </h3>
-                  <div className="prose prose-emerald prose-sm max-w-none text-gray-700 dark:text-gray-300 prose-p:leading-relaxed prose-li:my-1">
-                    <p className="whitespace-pre-line leading-relaxed text-sm">
-                      {recResult}
-                    </p>
+          {/* ── Farm Chat Layout (Sidebar + Chat Area) ── */}
+          <div className="flex flex-col md:flex-row items-start gap-6 animate-fade-in-up animation-delay-550">
+            {/* Sidebar - Desktop */}
+            <div className="w-full md:w-80 shrink-0 hidden md:block">
+              <Card className="border-2 border-emerald-100 dark:border-gray-800 shadow-xl dark:bg-gray-800 h-[700px] flex flex-col sticky top-24">
+                <CardHeader className="p-4 border-b border-emerald-100 dark:border-gray-700 bg-emerald-50/50 dark:bg-gray-800/50">
+                  <Button onClick={handleNewChat} className="w-full justify-start gap-2 bg-white hover:bg-emerald-50 text-emerald-700 border-2 border-emerald-200 dark:bg-gray-700 dark:text-emerald-400 dark:border-emerald-800/50 dark:hover:bg-gray-600 transition-all font-semibold shadow-sm">
+                    <Plus className="w-4 h-4" />
+                    Obrolan Baru
+                  </Button>
+                </CardHeader>
+                <CardContent className="p-2 flex-grow overflow-y-auto custom-scrollbar">
+                  <div className="space-y-1">
+                    {sessions.length === 0 ? (
+                      <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-6">Belum ada riwayat</p>
+                    ) : (
+                      sessions.map((session) => (
+                        <div 
+                          key={session.id}
+                          onClick={() => setActiveSessionId(session.id)}
+                          className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all ${
+                            activeSessionId === session.id 
+                              ? "bg-emerald-100 dark:bg-emerald-900/40 border-emerald-200 dark:border-emerald-800" 
+                              : "hover:bg-emerald-50 dark:hover:bg-gray-700 border-transparent"
+                          } border`}
+                        >
+                          <div className="flex items-center gap-3 overflow-hidden">
+                            <MessageSquare className={`w-4 h-4 shrink-0 ${activeSessionId === session.id ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                            <div className="truncate text-sm font-medium text-gray-700 dark:text-gray-300">
+                              {session.title}
+                            </div>
+                          </div>
+                          <button 
+                            onClick={(e) => handleDeleteSession(session.id, e)}
+                            className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 rounded-md transition-all shrink-0"
+                            title="Hapus Obrolan"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))
+                    )}
                   </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </div>
 
-          {/* Farm Chat AI */}
-          <Card className="border-2 border-emerald-100 dark:border-gray-800 dark:bg-gray-800 shadow-2xl animate-fade-in-up animation-delay-550">
-            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-800 border-b border-emerald-100 dark:border-gray-700">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center">
-                  <MessageCircle className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl font-black text-gray-900 dark:text-gray-100">
-                    Tanya AI Pertanian
-                  </CardTitle>
-                  <CardDescription className="dark:text-gray-400">
-                    Tanyakan apapun tentang pertanian, peternakan, dan
-                    pengelolaan lahan
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              {chatMessages.length > 0 && (
-                <div className="space-y-4 mb-6 max-h-[400px] overflow-y-auto rounded-xl bg-gray-50 dark:bg-gray-900/50 p-4 border border-gray-200 dark:border-gray-700 custom-scrollbar">
-                  {chatMessages.map((msg, idx) => (
-                    <div
-                      key={idx}
-                      className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                    >
-                      {msg.role === "bot" && (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shrink-0 mt-1">
-                          <Bot className="w-4 h-4 text-white" />
-                        </div>
-                      )}
-                      <div
-                        className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                          msg.role === "user"
-                            ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white"
-                            : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200"
-                        }`}
-                      >
-                        <p className="whitespace-pre-line">{msg.text}</p>
-                      </div>
-                      {msg.role === "user" && (
-                        <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center shrink-0 mt-1">
-                          <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  {chatLoading && (
-                    <div className="flex gap-3 justify-start">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shrink-0">
-                        <Bot className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 flex items-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin text-emerald-600 dark:text-emerald-400" />
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                          Sedang berpikir...
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-              <div className="flex gap-3">
-                <Textarea
-                  value={chatQuestion}
-                  onChange={(e) => setChatQuestion(e.target.value)}
-                  placeholder="Contoh: Bagaimana cara mengatasi hama wereng pada tanaman padi?"
-                  className="flex-1 border-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 focus:border-emerald-500 focus:ring-emerald-500 resize-none min-h-[48px] max-h-[120px]"
-                  rows={2}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleAskFarm();
-                    }
-                  }}
-                  disabled={chatLoading}
-                />
-                <Button
-                  onClick={handleAskFarm}
-                  disabled={chatLoading || !chatQuestion.trim()}
-                  className="h-auto bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-6 shadow-lg"
-                >
-                  {chatLoading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <Send className="w-5 h-5" />
-                  )}
+            {/* Mobile Sidebar Trigger & List (Stacked above chat on small screens) */}
+            <div className="block md:hidden w-full mb-2">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Riwayat Obrolan</h2>
+                <Button variant="outline" size="sm" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                  {isSidebarOpen ? "Tutup" : "Lihat Obrolan"}
                 </Button>
               </div>
-              <p className="text-xs text-gray-400 mt-2">
-                Tekan Enter untuk mengirim · Shift+Enter untuk baris baru
-              </p>
-            </CardContent>
-          </Card>
+
+              {isSidebarOpen && (
+                <Card className="border border-emerald-100 dark:border-gray-700 mb-4 bg-white dark:bg-gray-800 shadow-md">
+                  <CardHeader className="p-3 border-b border-gray-100 dark:border-gray-700">
+                    <Button onClick={handleNewChat} className="w-full justify-start gap-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-gray-700 dark:text-emerald-400 dark:hover:bg-gray-600 transition-all font-semibold" size="sm">
+                      <Plus className="w-4 h-4" />
+                      Obrolan Baru
+                    </Button>
+                  </CardHeader>
+                  <CardContent className="p-2 max-h-64 overflow-y-auto">
+                    <div className="space-y-1">
+                      {sessions.length === 0 ? (
+                        <p className="text-center text-sm text-gray-500 py-4">Belum ada riwayat</p>
+                      ) : (
+                        sessions.map((session) => (
+                          <div 
+                            key={session.id}
+                            onClick={() => { setActiveSessionId(session.id); setIsSidebarOpen(false); }}
+                            className={`flex items-center justify-between p-3 rounded-lg cursor-pointer ${
+                              activeSessionId === session.id 
+                                ? "bg-emerald-100 dark:bg-emerald-900/40 border-emerald-200 dark:border-emerald-800" 
+                                : "hover:bg-gray-50 dark:hover:bg-gray-700 border-transparent"
+                            } border`}
+                          >
+                            <div className="flex items-center gap-2 overflow-hidden">
+                              <MessageSquare className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                              <span className="truncate text-sm font-medium dark:text-gray-200">{session.title}</span>
+                            </div>
+                            <button 
+                              onClick={(e) => handleDeleteSession(session.id, e)}
+                              className="p-1.5 text-red-500 rounded-md shrink-0"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* Farm Chat AI Area */}
+            <Card className="border-2 border-emerald-100 dark:border-gray-800 dark:bg-gray-800 shadow-2xl flex-1 flex flex-col h-[700px] w-full min-w-0">
+              <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-800 border-b border-emerald-100 dark:border-gray-700 shrink-0">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center">
+                      <Bot className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl font-black text-gray-900 dark:text-gray-100">
+                        Tanya AI Pertanian
+                      </CardTitle>
+                      <CardDescription className="dark:text-gray-400">
+                        Tanyakan panduan budidaya, hama, hingga rekomendasi.
+                      </CardDescription>
+                    </div>
+                  </div>
+                  {/* Usage badge */}
+                  {usedQuota !== null && (
+                    <div className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border-2 shrink-0 ${
+                      quota === 0
+                        ? "bg-red-50 border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400"
+                        : quota !== null && quota <= 3
+                        ? "bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/20 dark:border-amber-700 dark:text-amber-400"
+                        : "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/20 dark:border-emerald-700 dark:text-emerald-400"
+                    }`}>
+                      <MessageCircle className="w-3 h-3" />
+                      {usedQuota}/{maxQuota} digunakan
+                    </div>
+                  )}
+                </div>
+              </CardHeader>
+
+              <CardContent className="p-0 flex flex-col flex-1 overflow-hidden">
+                <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                  {chatMessages.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center h-full">
+                      <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-4">
+                        <Sprout className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <p className="text-gray-500 dark:text-gray-400 font-medium text-lg">Konsultasi Pertanian Anda</p>
+                      <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Ajukan pertanyaan atau pilih rekomendasi di bawah ini untuk memulai pencatatan riwayat konsultasi.</p>
+                    </div>
+                  ) : (
+                    <>
+                      {chatMessages.map((msg, idx) => (
+                        <div
+                          key={idx}
+                          className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                        >
+                          {msg.role === "bot" && (
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shrink-0 mt-1">
+                              <Bot className="w-4 h-4 text-white" />
+                            </div>
+                          )}
+                          <div
+                            className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                              msg.role === "user"
+                                ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-tr-sm"
+                                : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-tl-sm shadow-sm"
+                            }`}
+                          >
+                            {msg.role === "bot" ? (
+                              <p
+                                className="whitespace-pre-line [&_strong]:text-emerald-700 dark:[&_strong]:text-emerald-400 [&_strong]:font-semibold"
+                                dangerouslySetInnerHTML={{
+                                  __html: msg.text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
+                                }}
+                              />
+                            ) : (
+                              <p className="whitespace-pre-line">{msg.text}</p>
+                            )}
+                          </div>
+                          {msg.role === "user" && (
+                            <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center shrink-0 mt-1">
+                              <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      {chatLoading && (
+                        <div className="flex gap-3 justify-start">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shrink-0">
+                            <Bot className="w-4 h-4 text-white" />
+                          </div>
+                          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 flex items-center gap-2 shadow-sm">
+                            <div className="flex gap-1">
+                              {[0, 1, 2].map((i) => (
+                                <span key={i} className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+                              ))}
+                            </div>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">Sedang berpikir...</span>
+                          </div>
+                        </div>
+                      )}
+                      {/* Sentinel element for auto-scroll */}
+                      <div ref={chatBottomRef} />
+                    </>
+                  )}
+                </div>
+                
+                {/* Input Area */}
+                <div className="p-4 bg-gray-50 dark:bg-gray-800/80 border-t border-emerald-100 dark:border-gray-700 shrink-0">
+                  <div className="flex flex-col gap-3">
+                    {/* Prompt suggestions mapping */}
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleAskFarm("Tanaman apa yang cocok ditanam sekarang melihat kondisi cuaca saat ini?")}
+                        className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-gray-700 dark:text-emerald-400 dark:hover:bg-gray-800 text-xs rounded-full bg-white dark:bg-gray-800"
+                      >
+                        <Leaf className="w-3 h-3 mr-1" /> Rekomendasi Tanam
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleAskFarm("Bagaimana cara membuat pupuk organik cair di rumah?")}
+                        className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-gray-700 dark:text-emerald-400 dark:hover:bg-gray-800 text-xs rounded-full bg-white dark:bg-gray-800"
+                      >
+                        <Sprout className="w-3 h-3 mr-1" /> Buat Pupuk Organik
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleAskFarm("Beri saya jadwal perawatan untuk menanam padi lokal.")}
+                        className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-gray-700 dark:text-emerald-400 dark:hover:bg-gray-800 text-xs rounded-full bg-white dark:bg-gray-800"
+                      >
+                        <Calendar className="w-3 h-3 mr-1" /> Jadwal Perawatan Padi
+                      </Button>
+                    </div>
+                    
+                    <div className="flex gap-3 items-end">
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Pesan Anda</Label>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={locationEnabled ? () => { setLocationEnabled(false); setUserLocation(null); } : handleGetLocation}
+                            className={`h-7 px-2 text-xs font-semibold ${
+                              locationEnabled 
+                                ? "text-emerald-600 bg-emerald-50 hover:bg-emerald-100 hover:text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" 
+                                : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+                            }`}
+                          >
+                            {locationLoading ? (
+                              <><Loader2 className="w-3 h-3 mr-1 pos-left animate-spin" /> Mengambil lokasi...</>
+                            ) : locationEnabled ? (
+                              <><MapPin className="w-3 h-3 mr-1" /> Lokasi Aktif</>
+                            ) : (
+                              <><MapPinOff className="w-3 h-3 mr-1" /> Deteksi Lokasi untuk Saran Akurat</>
+                            )}
+                          </Button>
+                        </div>
+                        <Textarea
+                          ref={chatInputRef}
+                          value={chatQuestion}
+                          onChange={(e) => setChatQuestion(e.target.value)}
+                          placeholder="Ketik pertanyaan Anda di sini..."
+                          className="flex-1 border-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 focus:border-emerald-500 focus:ring-emerald-500 resize-none min-h-[48px] max-h-[120px] rounded-xl"
+                          rows={2}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                              e.preventDefault();
+                              handleAskFarm();
+                            }
+                          }}
+                          disabled={chatLoading || quota === 0}
+                        />
+                      </div>
+                      <Button
+                        onClick={() => handleAskFarm()}
+                        disabled={chatLoading || !chatQuestion.trim() || quota === 0}
+                        className="h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-6 shadow-lg rounded-xl mb-0.5"
+                      >
+                        {chatLoading ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <Send className="w-5 h-5 ml-0.5" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  {quota === 0 && (
+                    <p className="text-xs text-red-600 dark:text-red-400 font-semibold mt-2">
+                      Kuota harian Anda habis ({maxQuota} pertanyaan). {!user && "Login untuk kuota lebih banyak."}
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-400 mt-2">
+                    Tekan Enter untuk mengirim · Shift+Enter untuk baris baru
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Features */}
           {/* <div className="animate-fade-in-up animation-delay-600">
