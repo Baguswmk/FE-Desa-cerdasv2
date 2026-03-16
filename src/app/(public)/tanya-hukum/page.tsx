@@ -80,12 +80,12 @@ export default function TanyaHukumPage() {
       setLoading(true);
       aiService.getHistory()
         .then((res) => {
-          const historyData = res.data || [];
+          const historyData = res.data?.data || res.data || [];
           
           // Group by session_id
           const grouped: Record<string, Session> = {};
           
-          historyData.reverse().forEach((q: any) => {
+          [...historyData].reverse().forEach((q: any) => {
             const sid = q.session_id || "null";
             if (!grouped[sid]) {
               grouped[sid] = {
@@ -109,7 +109,8 @@ export default function TanyaHukumPage() {
           // If no active session, but there are sessions, select the first one
           if (sessionList.length > 0 && !activeSessionId) {
             setActiveSessionId(sessionList[0].id);
-          } else if (sessionList.length === 0) {
+          } else if (sessionList.length === 0 && !activeSessionId) {
+            // Only clear if there's no active session we just optimistically set
             setMessages([]);
             setActiveSessionId(null);
           }
@@ -129,8 +130,6 @@ export default function TanyaHukumPage() {
       const session = sessions.find((s) => s.id === activeSessionId);
       if (session) {
         setMessages(session.messages);
-      } else {
-        setMessages([]);
       }
     } else {
       setMessages([]);
@@ -151,15 +150,21 @@ export default function TanyaHukumPage() {
 
     try {
       const response = await aiService.askQuestion(q, activeSessionId || undefined);
-      const ans = response.data?.answer ?? "Maaf, tidak ada jawaban.";
-      const newSessionId = response.data?.session_id;
-      const remQuota = response.data?.remaining_quota;
+      const ans = response.data?.answer || response.data?.data?.answer || "Maaf, tidak ada jawaban.";
+      const newSessionId = response.data?.session_id || response.data?.data?.session_id;
+      const remQuota = response.data?.remaining_quota ?? response.data?.data?.remaining_quota;
       
       if (remQuota !== undefined) setQuota(remQuota);
       
       // If this was a new session (no activeSessionId before), force a reload to get proper grouping & title
       if (!activeSessionId && newSessionId) {
         setActiveSessionId(newSessionId);
+        // We must append the bot message locally here as well, otherwise it disappears until reload finishes
+        setMessages((prev) => {
+          // Check if we need to manually add the user message again or if it's already there (it was added at the start)
+          // We just add the bot response
+          return [...prev, { role: "bot", text: ans }];
+        });
         loadHistory();
       } else {
         setMessages((prev) => [...prev, { role: "bot", text: ans }]);
