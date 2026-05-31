@@ -45,7 +45,7 @@ import {
 } from "lucide-react";
 import { kegiatanService } from "@/services/kegiatan.service";
 import { donasiService } from "@/services/donasi.service";
-
+import { toast } from "sonner";
 interface JadwalItem {
   tanggal: string;
   waktu: string;
@@ -155,10 +155,10 @@ export default function KegiatanDetailPage() {
 
   const handleSubmitDonation = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedFile) { alert("Silakan pilih bukti transfer"); return; }
+    if (!selectedFile) { toast.error("Silakan pilih bukti transfer"); return; }
     const rawAmount = Number(donationForm.amount.replace(/\D/g, ""));
     if (!rawAmount || rawAmount < 10000) {
-      alert("Minimal donasi Rp 10.000"); return;
+      toast.error("Minimal donasi Rp 10.000"); return;
     }
     setSubmitting(true);
     try {
@@ -174,7 +174,7 @@ export default function KegiatanDetailPage() {
       setSelectedFile(null);
       setTimeout(() => setSuccess(false), 5000);
     } catch (error: any) {
-      alert(error.response?.data?.message || "Gagal mengirim donasi");
+      toast.error(error.response?.data?.message || "Gagal mengirim donasi");
     } finally {
       setSubmitting(false);
     }

@@ -17,7 +17,7 @@ import { authService } from "@/services/auth.service";
 import { ThemeToggle } from "./theme-toggle";
 
 interface NavbarProps {
-  currentPage?: "kegiatan" | "smartfarm" | "tanya-hukum" | "tentang" | "donasi";
+  currentPage?: "kegiatan" | "smartfarm" | "tanya-hukum" | "tentang" | "donasi" | "zakat";
 }
 
 export default function Navbar({ currentPage = "kegiatan" }: NavbarProps) {
@@ -53,6 +53,7 @@ export default function Navbar({ currentPage = "kegiatan" }: NavbarProps) {
   const navLinks = [
     { href: "/kegiatan", label: "Beranda", page: "kegiatan" },
     { href: "/donasi", label: "Donasi", page: "donasi" },
+    { href: "/zakat", label: "Zakat", page: "zakat" },
     { href: "/smartfarm", label: "Smart Farm", page: "smartfarm" },
     { href: "/tanya-hukum", label: "Tanya Hukum", page: "tanya-hukum" },
     { href: "/tentang", label: "Tentang", page: "tentang" },

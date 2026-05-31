@@ -12,14 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Home,
   Sprout,
@@ -27,29 +19,34 @@ import {
   Loader2,
   PlusCircle,
   MapPin,
-  Layers,
-  Maximize2,
   Sparkles,
   Calendar,
   X,
   Leaf,
+  Thermometer,
+  CloudRain,
+  Wind,
+  Trash2,
+  Bot,
 } from "lucide-react";
 import { smartFarmService } from "@/services/smartfarm.service";
 import { useAuth } from "@/hooks/useAuth";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
-import type { SmartFarm } from "@/types";
+import { Badge } from "@/components/ui/badge";
+import WeatherWidget from "@/app/(public)/smartfarm/_components/WeatherWidget";
+import { toast } from "sonner";
 
 export default function SmartFarmPage() {
   const { user, logout } = useAuth();
-  const [farms, setFarms] = useState<SmartFarm[]>([]);
+  const [farms, setFarms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+
+  // Real forms mapping to correct Backend Schema
   const [formData, setFormData] = useState({
-    crop_type: "",
-    area_size: "",
+    plant_name: "",
+    plant_date: new Date().toISOString().split("T")[0],
     location: "",
-    soil_type: "",
-    current_condition: "",
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -75,186 +72,211 @@ export default function SmartFarmPage() {
     setSubmitting(true);
 
     try {
-      await smartFarmService.createFarm({
-        ...formData,
-        area_size: Number(formData.area_size),
+      await smartFarmService.createFarmRecord({
+        plant_name: formData.plant_name,
+        plant_date: new Date(formData.plant_date).toISOString(),
+        location: formData.location,
       });
 
       setShowForm(false);
       setFormData({
-        crop_type: "",
-        area_size: "",
+        plant_name: "",
+        plant_date: new Date().toISOString().split("T")[0],
         location: "",
-        soil_type: "",
-        current_condition: "",
       });
       loadFarms();
     } catch (error: any) {
-      alert(error.response?.data?.message || "Gagal menambahkan tanaman");
+      toast.error(
+        error.response?.data?.message || "Gagal menambahkan data tanaman",
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Hapus data tanaman ini?")) return;
+    try {
+      await smartFarmService.deleteFarmRecord(id);
+      loadFarms();
+    } catch (e: any) {
+      toast.error(e.response?.data?.message || "Gagal menghapus tanaman");
+    }
+  };
+
   if (loading || !user) {
-    return <LoadingScreen message="Memuat data tanaman..." />;
+    return <LoadingScreen message="Memuat data pertanian..." />;
   }
 
+  // Calculate percentage of harvest
+  const calculateHarvestProgress = (
+    plantDateStr: string,
+    estimateStr: string,
+  ) => {
+    const start = new Date(plantDateStr).getTime();
+    const end = new Date(estimateStr).getTime();
+    const now = new Date().getTime();
+
+    if (now >= end) return 100;
+    if (now <= start) return 0;
+
+    const total = end - start;
+    const elapsed = now - start;
+    return Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-emerald-50/30 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden">
       {/* Decorative Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-200/20 rounded-full blur-3xl animate-pulse-slow animation-delay-1000"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-200/20 dark:bg-emerald-900/20 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-200/20 dark:bg-teal-900/20 rounded-full blur-3xl animate-pulse-slow animation-delay-1000"></div>
       </div>
 
       {/* Navbar */}
-      <nav className="relative z-10 bg-white/80 backdrop-blur-md shadow-lg border-b-2 border-emerald-100 animate-fade-in-down">
+      <nav className="relative z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm border-b border-emerald-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3 animate-slide-in-left">
+            <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Sprout className="w-6 h-6 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-md">
+                  <Sprout className="w-5 h-5 text-white" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-amber-400 rounded-full border-2 border-white"></div>
               </div>
               <div>
-                <span className="text-xl font-black bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
-                  Smart Farm AI
+                <span className="text-xl font-black bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
+                  Smart Farm Warga
                 </span>
-                <p className="text-xs text-gray-500 font-medium">
-                  Pertanian Cerdas
-                </p>
               </div>
             </div>
-            <div className="flex items-center gap-3 animate-slide-in-right">
+            <div className="flex items-center gap-3">
               <Link href="/warga/dashboard">
                 <Button
                   variant="ghost"
-                  className="font-semibold text-gray-700 hover:text-emerald-700 hover:bg-emerald-50"
+                  size="sm"
+                  className="font-semibold text-gray-600 dark:text-gray-300 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-gray-800"
                 >
                   <Home className="w-4 h-4 mr-2" />
-                  Dashboard
+                  <span className="hidden sm:inline">Dashboard</span>
                 </Button>
               </Link>
               <Button
+                size="sm"
                 onClick={() => logout()}
-                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-sm"
               >
-                <LogOut className="w-4 h-4 mr-2" />
-                Keluar
+                <LogOut className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Keluar</span>
               </Button>
             </div>
           </div>
         </div>
       </nav>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header Banner */}
-        <Card className="border-2 shadow-2xl mb-8 overflow-hidden animate-fade-in-up animation-delay-200">
-          <CardHeader className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white p-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border-2 border-white/30">
-                  <Sprout className="w-8 h-8 text-white" />
-                </div>
-                <div>
-                  <CardTitle className="text-3xl font-black mb-2 text-white">
-                    🌱 Smart Farm AI
-                  </CardTitle>
-                  <CardDescription className="text-emerald-100 text-base font-medium">
-                    Kelola tanaman Anda dengan bantuan kecerdasan buatan
-                  </CardDescription>
-                </div>
-              </div>
-              <Button
-                onClick={() => setShowForm(!showForm)}
-                className="bg-white text-emerald-700 hover:bg-emerald-50 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all h-12"
-              >
-                <PlusCircle className="w-5 h-5 mr-2" />
-                Tambah Tanaman
-              </Button>
-            </div>
-          </CardHeader>
-        </Card>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Weather Mini-App for Dashboard */}
+        <div className="animate-fade-in-up animation-delay-100">
+          <WeatherWidget className="!shadow-md" />
+        </div>
 
-        {/* Add Form */}
+        {/* Header Action */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in-up animation-delay-200">
+          <div>
+            <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              <Leaf className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              Tanaman Saya
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+              Pantau perkembangan tanaman dan prediksi masa panen.
+            </p>
+          </div>
+
+          {!showForm && (
+            <Button
+              onClick={() => setShowForm(true)}
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold shadow-lg transform hover:-translate-y-0.5 transition-all"
+            >
+              <PlusCircle className="w-5 h-5 mr-2" />
+              Tambah Tanaman
+            </Button>
+          )}
+        </div>
+
+        {/* Add Form (Expandable) */}
         {showForm && (
-          <Card className="border-2 shadow-2xl mb-8 animate-scale-in animation-delay-300">
-            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-100">
+          <Card className="border-2 border-emerald-100 dark:border-gray-800 shadow-xl animate-scale-in dark:bg-gray-800">
+            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-800 border-b border-emerald-100 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-2xl font-black text-gray-900">
-                    Tambah Data Tanaman Baru
+                  <CardTitle className="text-xl font-black text-gray-900 dark:text-gray-100">
+                    Rekam Data Tanaman
                   </CardTitle>
-                  <CardDescription className="text-base mt-1">
-                    Isi informasi tanaman untuk mendapatkan rekomendasi AI
+                  <CardDescription className="dark:text-gray-400">
+                    AI akan otomatis mendeteksi cuaca dan memberikan panduan
+                    penanaman.
                   </CardDescription>
                 </div>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowForm(false)}
-                  className="hover:bg-red-50 hover:text-red-700"
+                  className="hover:bg-red-50 hover:text-red-700 dark:text-gray-400 dark:hover:bg-red-900/30"
                 >
                   <X className="w-5 h-5" />
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="p-8">
+            <CardContent className="p-6 sm:p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-5">
+                <div className="grid md:grid-cols-3 gap-5">
                   <div className="space-y-2">
                     <Label
-                      htmlFor="crop_type"
-                      className="text-sm font-black text-gray-700 uppercase tracking-wider flex items-center gap-2"
+                      htmlFor="plant_name"
+                      className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2"
                     >
-                      <Leaf className="w-4 h-4 text-emerald-600" />
-                      Jenis Tanaman *
+                      <Leaf className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      Nama Tanaman
                     </Label>
                     <Input
-                      id="crop_type"
+                      id="plant_name"
                       type="text"
                       required
-                      value={formData.crop_type}
+                      value={formData.plant_name}
                       onChange={(e) =>
-                        setFormData({ ...formData, crop_type: e.target.value })
+                        setFormData({ ...formData, plant_name: e.target.value })
                       }
-                      placeholder="Contoh: Padi, Jagung, Cabai"
-                      className="h-12 border-2 focus:border-emerald-500 focus:ring-emerald-500"
+                      placeholder="Misal: Padi Ciherang"
+                      className="border-2 dark:border-gray-700 dark:bg-gray-900 focus:border-emerald-500"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label
-                      htmlFor="area_size"
-                      className="text-sm font-black text-gray-700 uppercase tracking-wider flex items-center gap-2"
+                      htmlFor="plant_date"
+                      className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2"
                     >
-                      <Maximize2 className="w-4 h-4 text-emerald-600" />
-                      Luas Area (m²) *
+                      <Calendar className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      Tanggal Tanam
                     </Label>
                     <Input
-                      id="area_size"
-                      type="number"
+                      id="plant_date"
+                      type="date"
                       required
-                      min="1"
-                      value={formData.area_size}
+                      value={formData.plant_date}
                       onChange={(e) =>
-                        setFormData({ ...formData, area_size: e.target.value })
+                        setFormData({ ...formData, plant_date: e.target.value })
                       }
-                      placeholder="1000"
-                      className="h-12 border-2 focus:border-emerald-500 focus:ring-emerald-500"
+                      className="border-2 dark:border-gray-700 dark:bg-gray-900 focus:border-emerald-500"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label
                       htmlFor="location"
-                      className="text-sm font-black text-gray-700 uppercase tracking-wider flex items-center gap-2"
+                      className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2"
                     >
-                      <MapPin className="w-4 h-4 text-emerald-600" />
-                      Lokasi *
+                      <MapPin className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      Lokasi / Desa
                     </Label>
                     <Input
                       id="location"
@@ -264,77 +286,26 @@ export default function SmartFarmPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, location: e.target.value })
                       }
-                      placeholder="Nama dusun/kampung"
-                      className="h-12 border-2 focus:border-emerald-500 focus:ring-emerald-500"
+                      placeholder="Nama dusun/desa"
+                      className="border-2 dark:border-gray-700 dark:bg-gray-900 focus:border-emerald-500"
                     />
                   </div>
-
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="soil_type"
-                      className="text-sm font-black text-gray-700 uppercase tracking-wider flex items-center gap-2"
-                    >
-                      <Layers className="w-4 h-4 text-emerald-600" />
-                      Jenis Tanah *
-                    </Label>
-                    <Select
-                      required
-                      value={formData.soil_type}
-                      onValueChange={(value: string) =>
-                        setFormData({ ...formData, soil_type: value })
-                      }
-                    >
-                      <SelectTrigger className="h-12 border-2 focus:border-emerald-500 focus:ring-emerald-500">
-                        <SelectValue placeholder="Pilih jenis tanah" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="liat">Liat</SelectItem>
-                        <SelectItem value="berpasir">Berpasir</SelectItem>
-                        <SelectItem value="berhumus">Berhumus</SelectItem>
-                        <SelectItem value="lempung">Lempung</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="current_condition"
-                    className="text-sm font-black text-gray-700 uppercase tracking-wider"
-                  >
-                    Kondisi Saat Ini *
-                  </Label>
-                  <Textarea
-                    id="current_condition"
-                    required
-                    rows={4}
-                    value={formData.current_condition}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        current_condition: e.target.value,
-                      })
-                    }
-                    placeholder="Deskripsikan kondisi tanaman (umur, kesehatan, masalah yang dihadapi, dll)"
-                    className="border-2 focus:border-emerald-500 focus:ring-emerald-500 resize-none"
-                  />
-                </div>
-
-                <div className="flex gap-3 pt-4">
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
                   <Button
                     type="submit"
                     disabled={submitting}
-                    className="flex-1 h-14 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
+                    className="sm:w-auto px-8 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold shadow-md"
                   >
                     {submitting ? (
                       <>
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Menambahkan...
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Sedang
+                        Menganalisis...
                       </>
                     ) : (
                       <>
-                        <PlusCircle className="w-5 h-5 mr-2" />
-                        Tambahkan Tanaman
+                        <Sparkles className="w-4 h-4 mr-2" /> Analisis dengan AI
                       </>
                     )}
                   </Button>
@@ -342,7 +313,7 @@ export default function SmartFarmPage() {
                     type="button"
                     variant="outline"
                     onClick={() => setShowForm(false)}
-                    className="h-14 px-8 border-2 font-bold hover:bg-gray-50"
+                    className="sm:w-auto px-8 border-2 font-bold dark:border-gray-700 dark:text-gray-300"
                   >
                     Batal
                   </Button>
@@ -353,122 +324,170 @@ export default function SmartFarmPage() {
         )}
 
         {/* Farms List */}
-        {loading ? (
-          <div className="text-center py-12 animate-fade-in">
-            <div className="inline-block w-16 h-16 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse-slow">
-              <Loader2 className="w-8 h-8 text-white animate-spin" />
-            </div>
-            <p className="text-lg font-semibold text-gray-700">
-              Memuat data tanaman...
-            </p>
-          </div>
-        ) : farms.length === 0 ? (
-          <Card className="border-2 shadow-2xl animate-scale-in animation-delay-300">
+        {!loading && farms.length === 0 ? (
+          <Card className="border-2 border-dashed border-gray-200 dark:border-gray-700 shadow-none bg-transparent">
             <CardContent className="text-center py-16">
-              <div className="inline-block p-5 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-3xl mb-6 animate-bounce-in">
-                <Sprout className="w-16 h-16 text-emerald-600" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
+                <Sprout className="w-8 h-8 text-gray-400" />
               </div>
-              <h3 className="text-2xl font-black text-gray-900 mb-3">
-                Belum Ada Data Tanaman
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                Belum ada tanaman
               </h3>
-              <p className="text-gray-600 font-medium max-w-md mx-auto mb-6">
-                Mulai tambahkan data tanaman Anda untuk mendapatkan rekomendasi
-                AI
+              <p className="text-gray-500 dark:text-gray-400 mb-6 mw-md mx-auto">
+                Kami akan menganalisis cuaca otomatis saat Anda merekam data.
               </p>
-              <Button
-                onClick={() => setShowForm(true)}
-                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
-              >
-                <PlusCircle className="w-5 h-5 mr-2" />
-                Tambah Tanaman Pertama
-              </Button>
+              {!showForm && (
+                <Button
+                  onClick={() => setShowForm(true)}
+                  className="bg-emerald-600 hover:bg-emerald-700"
+                >
+                  Tambah Rekaman Pertama
+                </Button>
+              )}
             </CardContent>
           </Card>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {farms.map((farm, index) => (
-              <Card
-                key={farm.id}
-                className={`border-2 shadow-2xl overflow-hidden hover:shadow-emerald-200 transition-all duration-300 animate-fade-in-up animation-delay-${(index + 3) * 100}`}
-              >
-                <CardHeader className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-2xl font-black mb-2">
-                        {farm.crop_type}
-                      </CardTitle>
-                      <CardDescription className="flex items-center gap-2 text-emerald-100 font-medium">
-                        <MapPin className="w-4 h-4" />
-                        {farm.location}
-                      </CardDescription>
-                    </div>
-                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border-2 border-white/30">
-                      <Leaf className="w-6 h-6 text-white" />
-                    </div>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="p-6">
-                  <div className="space-y-3 mb-4">
-                    <div className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-emerald-50/50 rounded-lg border border-gray-200">
-                      <div className="flex items-center gap-2">
-                        <Maximize2 className="w-4 h-4 text-emerald-600" />
-                        <span className="text-sm font-semibold text-gray-600">
-                          Luas Area
-                        </span>
+          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
+            {farms.map((farm, index) => {
+              const progress = farm.harvest_estimate
+                ? calculateHarvestProgress(
+                    farm.plant_date,
+                    farm.harvest_estimate,
+                  )
+                : 0;
+              return (
+                <Card
+                  key={farm.id}
+                  className={`border-2 border-gray-100 dark:border-gray-800 shadow-lg hover:shadow-xl dark:bg-gray-800 transition-all duration-300 animate-fade-in-up animation-delay-${Math.min(index, 5) * 100} group`}
+                >
+                  <CardHeader className="bg-gradient-to-r from-emerald-50 to-white dark:from-gray-800 dark:to-gray-800 border-b border-gray-100 dark:border-gray-700 pb-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <CardTitle className="text-xl font-black text-gray-900 dark:text-gray-100">
+                            {farm.plant_name}
+                          </CardTitle>
+                          {progress >= 100 && (
+                            <Badge className="bg-amber-500 hover:bg-amber-600">
+                              Siap Panen!
+                            </Badge>
+                          )}
+                        </div>
+                        <CardDescription className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 font-medium text-xs">
+                          <MapPin className="w-3.5 h-3.5" />
+                          {farm.location}
+                        </CardDescription>
                       </div>
-                      <span className="font-black text-gray-900">
-                        {farm.area_size} m²
-                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(farm.id)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 px-2 h-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-emerald-50/50 rounded-lg border border-gray-200">
-                      <div className="flex items-center gap-2">
-                        <Layers className="w-4 h-4 text-emerald-600" />
-                        <span className="text-sm font-semibold text-gray-600">
-                          Jenis Tanah
-                        </span>
+                  </CardHeader>
+
+                  <CardContent className="p-0">
+                    {/* Harvest Progress */}
+                    {farm.harvest_estimate && (
+                      <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-700 bg-emerald-50/30 dark:bg-gray-800/50">
+                        <div className="flex justify-between items-end mb-2">
+                          <span className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                            Estimasi Panen
+                          </span>
+                          <span className="text-sm font-black text-emerald-700 dark:text-emerald-400">
+                            {progress}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-2 overflow-hidden shadow-inner">
+                          <div
+                            className="bg-gradient-to-r from-emerald-500 to-teal-500 h-2.5 rounded-full transition-all duration-1000"
+                            style={{ width: `${progress}%` }}
+                          ></div>
+                        </div>
+                        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 font-medium mt-2">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" /> Tanam:{" "}
+                            {new Date(farm.plant_date).toLocaleDateString(
+                              "id-ID",
+                              {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              },
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 text-amber-700 dark:text-amber-500 font-bold">
+                            <Sparkles className="w-3 h-3" /> Panen:{" "}
+                            {new Date(farm.harvest_estimate).toLocaleDateString(
+                              "id-ID",
+                              {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              },
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <span className="font-black text-gray-900 capitalize">
-                        {farm.soil_type}
-                      </span>
+                    )}
+
+                    <div className="p-5 flex flex-col gap-4">
+                      {/* Weather Data Snapshot at planting */}
+                      {farm.weather_data &&
+                        Object.keys(farm.weather_data).length > 0 && (
+                          <div className="flex flex-wrap gap-3">
+                            <Badge
+                              variant="outline"
+                              className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 gap-1 font-semibold py-1"
+                            >
+                              <Thermometer className="w-3 h-3 text-red-500" />{" "}
+                              {farm.weather_data.temperature}°C
+                            </Badge>
+                            <Badge
+                              variant="outline"
+                              className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 gap-1 font-semibold py-1"
+                            >
+                              <CloudRain className="w-3 h-3 text-blue-500" />{" "}
+                              {farm.weather_data.humidity}%
+                            </Badge>
+                            <Badge
+                              variant="outline"
+                              className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 gap-1 font-semibold py-1"
+                            >
+                              <Wind className="w-3 h-3 text-gray-500" />{" "}
+                              {farm.weather_data.wind_speed} m/s
+                            </Badge>
+                          </div>
+                        )}
+
+                      {/* AI Analysis */}
+                      {farm.ai_analysis && (
+                        <div className="bg-blue-50 dark:bg-blue-900/10 border-l-4 border-blue-500 p-4 rounded-r-xl">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Bot className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            <p className="text-xs font-black text-blue-800 dark:text-blue-400 uppercase tracking-wider">
+                              Saran Tindakan AI
+                            </p>
+                          </div>
+                          <div
+                            className="text-sm text-blue-900 dark:text-blue-100 whitespace-pre-line leading-relaxed font-medium"
+                            dangerouslySetInnerHTML={{
+                              __html: farm.ai_analysis.replace(
+                                /\*\*(.*?)\*\*/g,
+                                "<strong>$1</strong>",
+                              ),
+                            }}
+                          />
+                        </div>
+                      )}
                     </div>
-                  </div>
-
-                  <div className="mb-4 p-4 bg-gray-50 rounded-xl border-2 border-gray-100">
-                    <p className="text-xs font-black text-gray-500 uppercase tracking-wider mb-2">
-                      Kondisi:
-                    </p>
-                    <p className="text-sm text-gray-900 line-clamp-2 font-medium">
-                      {farm.current_condition}
-                    </p>
-                  </div>
-
-                  {farm.ai_recommendation && (
-                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-xl p-4 mb-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Sparkles className="w-4 h-4 text-emerald-600" />
-                        <p className="text-xs font-black text-emerald-800 uppercase tracking-wider">
-                          Rekomendasi AI
-                        </p>
-                      </div>
-                      <p className="text-sm text-emerald-900 line-clamp-3 font-medium">
-                        {farm.ai_recommendation}
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="flex items-center gap-2 text-xs text-gray-500 font-medium pt-2 border-t border-gray-200">
-                    <Calendar className="w-3 h-3" />
-                    Dibuat:{" "}
-                    {new Date(farm.created_at).toLocaleDateString("id-ID", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>

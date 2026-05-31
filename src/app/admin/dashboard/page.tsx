@@ -262,9 +262,10 @@ export default function AdminDashboardPage() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-8">
         {/* Welcome banner */}
-        <Card className="border-2 shadow-2xl overflow-hidden animate-fade-in-up animation-delay-200">
-          <CardHeader className="bg-gradient-to-br from-emerald-600 via-green-600 to-teal-600 text-white p-6 md:p-10">
-            <div className="flex items-center justify-between">
+        <Card className="border-2 shadow-2xl overflow-hidden animate-fade-in-up animation-delay-200 dark:border-gray-800">
+          <CardHeader className="bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-emerald-600 via-green-600 to-teal-700 dark:from-emerald-900 dark:via-green-900 dark:to-teal-950 text-white p-6 md:p-10 relative">
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNiIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utb3BhY2l0eT0iLjA2IiBzdHJva2Utd2lkdGg9IjIiLz48L2c+PC9zdmc+')] opacity-20"></div>
+            <div className="flex items-center justify-between relative z-10">
               <div className="flex-1 min-w-0">
                 <CardTitle className="text-2xl md:text-4xl font-black mb-2 text-white">
                   Selamat Datang, {user.nama}! 👋
@@ -290,10 +291,12 @@ export default function AdminDashboardPage() {
               return (
                 <Card
                   key={i}
-                  className={`border-2 border-l-4 ${stat.border} shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1`}
+                  className={`border-2 border-l-4 ${stat.border} shadow-xl hover:shadow-2xl dark:bg-gray-800/80 dark:border-r-gray-800 dark:border-t-gray-800 dark:border-b-gray-800 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] cursor-default`}
                 >
-                  <CardContent className="p-4 md:p-5">
-                    <div className="flex items-center justify-between mb-2">
+                  <CardContent className="p-4 md:p-5 relative overflow-hidden">
+                    {/* Subtle background glow */}
+                    <div className={`absolute -bottom-6 -right-6 w-24 h-24 bg-gradient-to-br ${stat.gradient} opacity-10 rounded-full blur-2xl`}></div>
+                    <div className="flex items-center justify-between mb-2 relative z-10">
                       <p className="text-gray-500 dark:text-gray-400 text-xs font-black uppercase tracking-wide leading-tight">
                         {stat.label}
                       </p>
@@ -421,29 +424,29 @@ export default function AdminDashboardPage() {
         )}
 
         {/* Export Section */}
-        <Card className="border-2 border-emerald-100 dark:border-emerald-900/50 shadow-xl bg-white/50 dark:bg-gray-900/50 backdrop-blur">
-          <CardHeader className="pb-3">
+        <Card className="border-2 border-emerald-100 dark:border-emerald-900/50 shadow-2xl bg-white/60 dark:bg-gray-900/60 backdrop-blur-md">
+          <CardHeader className="pb-3 border-b border-gray-100 dark:border-gray-800/50">
             <CardTitle className="text-lg font-black text-gray-900 dark:text-gray-100 flex items-center gap-2">
               <Download className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-              Export Laporan
+              Export Laporan Keseluruhan
             </CardTitle>
             <CardDescription className="dark:text-gray-400">
-              Unduh data dalam format Excel / CSV
+              Unduh data mentah sistem untuk keperluan audit eksternal
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="flex flex-col sm:flex-row gap-3">
               {/* Export Donasi */}
-              <div className="flex-1 flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 bg-purple-50 dark:bg-purple-900/20 border-2 border-purple-100 dark:border-purple-800/50 rounded-2xl">
-                <div className="w-11 h-11 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-md shrink-0">
-                  <FileSpreadsheet className="w-5 h-5 text-white" />
+              <div className="flex-1 flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/10 border-2 border-purple-100/50 dark:border-purple-800/30 hover:border-purple-300 dark:hover:border-purple-700/50 rounded-2xl transition-colors shadow-sm group">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform shrink-0">
+                  <FileSpreadsheet className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-bold text-gray-900 dark:text-gray-100">
+                  <p className="font-black text-gray-900 dark:text-gray-100 text-lg">
                     Data Donasi
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    Semua transaksi masuk
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-0.5">
+                    Excel rekapitulasi donasi
                   </p>
                 </div>
                 <Button
@@ -461,16 +464,16 @@ export default function AdminDashboardPage() {
               </div>
 
               {/* Export Kegiatan */}
-              <div className="flex-1 flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-100 dark:border-emerald-800/50 rounded-2xl">
-                <div className="w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-md shrink-0">
-                  <ClipboardList className="w-5 h-5 text-white" />
+              <div className="flex-1 flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/10 border-2 border-emerald-100/50 dark:border-emerald-800/30 hover:border-emerald-300 dark:hover:border-emerald-700/50 rounded-2xl transition-colors shadow-sm group">
+                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform shrink-0">
+                  <ClipboardList className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-black text-gray-900 dark:text-gray-100 text-sm">
-                    Data Kegiatan
+                  <p className="font-black text-gray-900 dark:text-gray-100 text-lg">
+                    Daftar Kegiatan
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Seluruh kegiatan tercatat (CSV)
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    CSV seluruh kegiatan desa
                   </p>
                 </div>
                 <Button
@@ -666,23 +669,34 @@ export default function AdminDashboardPage() {
                     </Button>
 
                     {Array.from({ length: totalPageLogs }, (_, i) => i + 1)
-                      .filter(p => totalPageLogs <= 5 || p === 1 || p === totalPageLogs || Math.abs(p - logPage) <= 1)
+                      .filter(
+                        (p) =>
+                          totalPageLogs <= 5 ||
+                          p === 1 ||
+                          p === totalPageLogs ||
+                          Math.abs(p - logPage) <= 1,
+                      )
                       .map((p, i, arr) => (
                         <div key={p} className="flex gap-1 items-center">
-                          {i > 0 && p - arr[i - 1] > 1 && <span className="text-gray-400 dark:text-gray-500 font-bold px-1">...</span>}
-                          <Button 
-                            variant={logPage === p ? 'default' : 'outline'} 
+                          {i > 0 && p - arr[i - 1] > 1 && (
+                            <span className="text-gray-400 dark:text-gray-500 font-bold px-1">
+                              ...
+                            </span>
+                          )}
+                          <Button
+                            variant={logPage === p ? "default" : "outline"}
                             size="sm"
                             onClick={() => setLogPage(p)}
-                            className={logPage === p 
-                              ? "bg-emerald-600 hover:bg-emerald-700 text-white font-black dark:bg-emerald-600 dark:hover:bg-emerald-700 border-none shadow-md h-8 w-8 p-0" 
-                              : "border-2 font-bold text-gray-600 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-800 h-8 w-8 p-0"}
+                            className={
+                              logPage === p
+                                ? "bg-emerald-600 hover:bg-emerald-700 text-white font-black dark:bg-emerald-600 dark:hover:bg-emerald-700 border-none shadow-md h-8 w-8 p-0"
+                                : "border-2 font-bold text-gray-600 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-800 h-8 w-8 p-0"
+                            }
                           >
                             {p}
                           </Button>
                         </div>
-                      ))
-                    }
+                      ))}
 
                     <Button
                       variant="outline"

@@ -100,6 +100,17 @@ export default function WargaDashboardPage() {
     }).format(amount);
   };
 
+  const calculateHarvestProgress = (plantDateStr: string, estimateStr: string) => {
+    if (!plantDateStr || !estimateStr) return 0;
+    const start = new Date(plantDateStr).getTime();
+    const end = new Date(estimateStr).getTime();
+    const now = new Date().getTime();
+
+    if (now >= end) return 100;
+    if (now <= start) return 0;
+    return Math.min(100, Math.max(0, Math.round(((now - start) / (end - start)) * 100)));
+  };
+
   if (loading || !user) {
     return <LoadingScreen message="Memuat dashboard..." />;
   }
@@ -480,55 +491,62 @@ export default function WargaDashboardPage() {
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {farms.slice(0, 3).map((farm, index) => (
-                  <Card
-                    key={farm.id}
-                    className={`border-2 dark:border-gray-800 dark:bg-gray-800 hover:shadow-lg transition-all animate-scale-in animation-delay-${(index + 7) * 100}`}
-                  >
-                    <CardHeader className="bg-gradient-to-r from-green-500 to-emerald-600 dark:from-green-700 dark:to-emerald-800 text-white p-5">
-                      <CardTitle className="text-xl font-black">
-                        {farm.crop_type}
-                      </CardTitle>
-                      <CardDescription className="text-emerald-100 dark:text-emerald-200 font-medium flex items-center gap-1">
-                        <User className="w-3 h-3" />
-                        {farm.location}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="p-5">
-                      <div className="space-y-3 mb-4">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600 dark:text-gray-400 font-semibold">
-                            Luas Area
-                          </span>
-                          <span className="font-black text-gray-900 dark:text-gray-100">
-                            {farm.area_size} m²
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600 dark:text-gray-400 font-semibold">
-                            Jenis Tanah
-                          </span>
-                          <span className="font-black text-gray-900 dark:text-gray-100 capitalize">
-                            {farm.soil_type}
-                          </span>
-                        </div>
-                      </div>
-                      {farm.ai_recommendation && (
-                        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-900 dark:to-gray-900 border-2 border-emerald-200 dark:border-emerald-900/50 rounded-xl p-3">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                            <p className="text-xs font-black text-emerald-800 dark:text-emerald-300 uppercase">
-                              Rekomendasi AI
+                {farms.slice(0, 3).map((farm, index) => {
+                  const progress = farm.harvest_estimate ? calculateHarvestProgress(farm.plant_date, farm.harvest_estimate) : 0;
+                  return (
+                    <Card
+                      key={farm.id}
+                      className={`border-2 dark:border-gray-800 dark:bg-gray-800 hover:shadow-lg hover:border-emerald-300 dark:hover:border-emerald-700 transition-all animate-scale-in animation-delay-${(index + 7) * 100}`}
+                    >
+                      <CardHeader className="bg-gradient-to-r from-emerald-500 to-teal-600 dark:from-emerald-700 dark:to-teal-800 text-white p-5 border-b border-emerald-400 dark:border-emerald-900">
+                        <CardTitle className="text-xl font-black">
+                          {farm.plant_name}
+                        </CardTitle>
+                        <CardDescription className="text-emerald-100 dark:text-emerald-200 font-medium flex items-center gap-1 mt-1">
+                          <User className="w-3.5 h-3.5" />
+                          {farm.location}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="p-0">
+                        {farm.harvest_estimate && (
+                          <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-700 bg-emerald-50/50 dark:bg-gray-800/80">
+                            <div className="flex justify-between items-end mb-2">
+                               <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Progress Panen</span>
+                               <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
+                                  {progress}%
+                               </span>
+                            </div>
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2 overflow-hidden shadow-inner">
+                              <div
+                                className="bg-gradient-to-r from-emerald-500 to-teal-500 h-2 rounded-full transition-all duration-1000"
+                                style={{ width: `${progress}%` }}
+                              ></div>
+                            </div>
+                            <p className="text-[10px] text-gray-400 font-medium flex justify-between">
+                               <span>{new Date(farm.plant_date).toLocaleDateString("id-ID")}</span>
+                               <span>{new Date(farm.harvest_estimate).toLocaleDateString("id-ID")}</span>
                             </p>
                           </div>
-                          <p className="text-sm text-emerald-900 dark:text-emerald-400 line-clamp-2 font-medium">
-                            {farm.ai_recommendation}
-                          </p>
+                        )}
+                        <div className="p-5">
+                          {farm.ai_analysis && (
+                            <div className="bg-gradient-to-br from-gray-50 to-emerald-50/30 dark:from-gray-900/50 dark:to-gray-900/80 border-l-4 border-emerald-500 dark:border-emerald-600 rounded-r-xl p-3">
+                              <div className="flex items-center gap-2 mb-1.5">
+                                <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                <p className="text-[11px] font-black text-emerald-800 dark:text-emerald-400 uppercase">
+                                  AI Analysis
+                                </p>
+                              </div>
+                              <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-3 font-medium leading-relaxed">
+                                {farm.ai_analysis.replace(/[\*#]/g, "") /* Strip markdown temporarily for preview */}
+                              </p>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             )}
             {farms.length > 3 && (

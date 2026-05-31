@@ -78,14 +78,12 @@ export interface ExpenseReport {
 export interface SmartFarm {
   id: string;
   user_id: string;
-  farm_name: string;
-  location?: string | null;
-  crop_type?: string | null;
-  area_size?: number | null;
-  soil_type?: string | null;
-  current_condition?: string | null;
-  ai_recommendation?: string | null;
-  weather_data?: unknown;
+  plant_name: string;
+  plant_date: string;
+  location: string;
+  weather_data?: any;
+  ai_analysis?: string;
+  harvest_estimate?: string;
   created_at: string;
   updated_at: string;
 }
